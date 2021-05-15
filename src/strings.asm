@@ -41,6 +41,8 @@ str_path_rom:
     .asciiz "/usr/share/systemd/systemd.rom"    
 
 str_failed:
-    .byte "..............",$81,"[FAILED]",$0D,$00
+    .byte ".............."
+str_failed_word:    
+    .byte $81,"[FAILED]",$0D,$00
 str_error_path_not_found:
     .byte "File not found : ",$00

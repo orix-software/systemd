@@ -142,12 +142,12 @@ no_chars:
 
 
 
-    print   str_failed,NOSAVE
+    print   str_failed_word,NOSAVE
     BRK_KERNEL XCRLF 
     print   str_error_path_not_found
     print   (buffer)
     BRK_KERNEL XCRLF
-    mfree (ptr1)     
+  ;  mfree (ptr1)     
     
     rts
     
@@ -219,13 +219,6 @@ no_chars:
 
 run:
     jmp (ptr2)
-
-
-
-    
-    
-
-
 .endproc
 
 
