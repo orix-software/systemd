@@ -49,8 +49,8 @@ endif
 MYDATE = $(shell date +"%Y-%m-%d %H:%m")
   
 code: $(SOURCE)
-	$(AS) -I libs/usr/include/ $(CFLAGS)  $(SOURCE) $(LDFILES) -o $(PROGRAM) 
-	$(LD) -tnone -o $(PROGRAM) 
+	$(AS) -I libs/usr/include/ $(CFLAGS)  $(SOURCE) $(LDFILES) -o $(PROGRAM).ld65
+	$(LD) -tnone -o $(PROGRAM)  $(PROGRAM).ld65
 
 
 srccode: $(SOURCE)

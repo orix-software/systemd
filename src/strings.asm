@@ -30,6 +30,8 @@ str_starting:
     .asciiz "Starting systemd "    
 str_token_path:
     .asciiz "path"    
+str_token_autoexec:
+    .asciiz "autoexec"    
 str_nothing_to_read:    
     .asciiz "Nothing to read"
 path_modules:    
