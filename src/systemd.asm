@@ -32,7 +32,7 @@ _systemd:
 
 .proc systemd_start
 
-    lda     #34
+    lda     #33 ; Init to bank 33
     sta     next_bank
 
     print   str_starting,NOSAVE
@@ -80,27 +80,40 @@ _systemd:
     rts
 
 @continue:
+
     sta      buffer
     sta      ptr1
     sty      buffer+1
     sty      ptr1+1
 
 	sta      PTR_READ_DEST
+    sta      ptr3   ; for compute
 	sty      PTR_READ_DEST+1
+    sty      ptr3+1 ; for compute
 
 	lda      #<1000
     ldy      #>1000
 
 	BRK_KERNEL XFREAD
+    
+    lda      PTR_READ_DEST+1
+    sec
+    sbc      ptr3+1
+    tax
+    lda      PTR_READ_DEST
+    sec
+    sbc      ptr3
+
+
     cmp      #$00
     bne      @read_success
-    cpx      #$00
+    cpx      #$10
     bne      @read_success
     mfree (buffer)
     fclose (fd_systemd)    
     print    str_nothing_to_read
     rts
-
+;255 232
 
 @read_success:
 
@@ -367,8 +380,8 @@ run:
 
 
 .proc open_file
-    sta     @filename+1
-    sty     @filename+2
+    sta      ptr2
+    sty      ptr2+1
     malloc   100,str_oom ; [,oom_msg_ptr] [,fail_value]
     cpy      #$00
     bne      @continue
@@ -385,7 +398,7 @@ run:
     ldy  #$00
 @loop4:    
 @filename:
-    lda     str_path_rom,y
+    lda     (ptr2),y
     beq     @out
     sta     (ptr1),y
     iny
