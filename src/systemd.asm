@@ -583,7 +583,7 @@ list_commands:
         .addr command0_str
 ; $fff7
 number_of_commands:
-        .byt 2
+        .byt 1
 signature_address:
         .word   rom_signature
 
