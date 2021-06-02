@@ -67,6 +67,7 @@ jobs:
           git config --local core.sparseCheckout true
           echo "src/include" >> .git/info/sparse-checkout
           git checkout
+          git submodule update --recursive --remote
 
       - name: Compile orix-sdk
         if: steps.cache-sdk.outputs.cache-hit != 'true'
