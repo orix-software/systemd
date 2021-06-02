@@ -34,6 +34,7 @@ HOMEDIR=/home/travis/bin/
 
 SOURCE=src/$(PROGRAM).asm
 
+VERSION=$(shell cat VERSION)
 
 ifdef TRAVIS_BRANCH
 ifeq ($(TRAVIS_BRANCH), master)
@@ -50,7 +51,8 @@ MYDATE = $(shell date +"%Y-%m-%d %H:%m")
   
 code: $(SOURCE)
 	$(AS) -I libs/usr/include/ $(CFLAGS)  $(SOURCE) $(LDFILES) -o $(PROGRAM).ld65
-	$(LD) -tnone -o $(PROGRAM)  $(PROGRAM).ld65
+	$(LD) -tnone -o $(PROGRAM).rom  $(PROGRAM).ld65
+	mkdir build/usr/share/systemd/$(VERSION) -p  && cp $(PROGRAM).rom build/usr/share/systemd/$(VERSION)/$(PROGRAM).rom 
 
 
 srccode: $(SOURCE)
