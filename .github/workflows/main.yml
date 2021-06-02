@@ -112,7 +112,7 @@ jobs:
         run: mv cc65 ../ && mv orix-software ../ && mv orix-sdk ../ && mv md2hlp ../
 
       - name: Compile project
-        run: ls -l && ls -l dependencies && ls -l dependencies/orix-sdk && echo find && find dependencies/ && pwd && ./configure && CC65_HOME=${GITHUB_WORKSPACE}/../cc65 make
+        run: git submodule update --recursive --remote && ls -l && ls -l dependencies && ls -l dependencies/orix-sdk && echo find && find dependencies/ && pwd && ./configure && CC65_HOME=${GITHUB_WORKSPACE}/../cc65 make
 
       - name: List build directory content
         run: ls -lR build
