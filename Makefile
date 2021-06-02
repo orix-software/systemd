@@ -52,7 +52,7 @@ MYDATE = $(shell date +"%Y-%m-%d %H:%m")
 code: $(SOURCE)
 	$(AS) -I libs/usr/include/ $(CFLAGS)  $(SOURCE) $(LDFILES) -o $(PROGRAM).ld65
 	$(LD) -tnone -o $(PROGRAM).rom  $(PROGRAM).ld65
-	mkdir build/usr/share/systemd/$(VERSION) -p  && cp $(PROGRAM).rom build/usr/share/systemd/$(VERSION)/$(PROGRAM).rom 
+	mkdir build/usr/share/systemd/$(VERSION) -p  && cp $(PROGRAM).rom build/usr/share/systemd/$(VERSION)/$(PROGRAM).rom  && cp $(PROGRAM).rom build/usr/share/systemd/$(PROGRAM).rom 
 
 
 srccode: $(SOURCE)
