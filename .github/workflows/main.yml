@@ -90,11 +90,10 @@ jobs:
       repo_name: ${{ steps.job_vars.outputs.REPO_NAME }}
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
         with:
-          remote: true
+          submodules: recursive
 
       - name: Set job variables
         id: job_vars
