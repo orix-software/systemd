@@ -91,6 +91,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action
+        with:
+          remote: true
 
       - name: Set job variables
         id: job_vars
