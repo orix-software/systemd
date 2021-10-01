@@ -1,3 +1,6 @@
 [submodule "dependencies/orix-sdk"]
 	path = dependencies/orix-sdk
 	url = https://github.com/assinie/orix-sdk.git
+[submodule "dependencies/ch395-lib"]
+	path = dependencies/ch395-lib
+	url = https://github.com/orix-software/ch395-lib

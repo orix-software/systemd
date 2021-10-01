@@ -3,8 +3,13 @@
 
 .include   "telestrat.inc"
 .include   "fcntl.inc"
+.include   "cpu.mac"
 
-    userzp := $80 ; FIXME
+.define TWIL_INTERFACE_NUMBER_OF_RAM_BANK       32
+.define TWIL_INTERFACE_NUMBER_OF_CHARS_IN_LABEL 8
+
+userzp := $80
+
 
     fd_systemd := userzp
     buffer := userzp+2
@@ -27,20 +32,24 @@
 .org $c000
 
 .code
+; Entry point
+; $c000
+    jmp     systemd_start
+; $c003
+    jmp     _start_twilfirmware
+; $c006
+    jmp     _start_twilsoft
 
 _systemd:
 
 .proc systemd_start
 
-    lda     #33 ; Init to bank 33
+    lda     #34 ; Init to bank 33
     sta     next_bank
 
     print   str_starting,NOSAVE
     print   version,NOSAVE
     print   systemd_starting,NOSAVE
-    ;print   str_reading_modules
-
-	;jsr     read_modules
 
     print   str_reading_banks
 
@@ -53,6 +62,8 @@ _systemd:
 .include "commands/lsmod.asm"
 .include "commands/rmmod.asm"
 .include "commands/insmod.asm"
+.include "commands/twilconf/twilfirm.s"
+.include "commands/twilconf/twilsoft.s"
 .include "strings.asm"
 
 .proc read_banks
@@ -71,7 +82,7 @@ _systemd:
     rts
 @found:
     ; fd_systemd is stored in open_file
-    malloc   1000
+    malloc   1000           ; FIXME
     cpy      #$00
     bne      @continue
     cmp      #$00
@@ -109,11 +120,10 @@ _systemd:
     bne      @read_success
     cpx      #$10
     bne      @read_success
-    mfree (buffer)
-    fclose (fd_systemd)    
+    mfree    (buffer)
+    fclose   (fd_systemd)    
     print    str_nothing_to_read
     rts
-;255 232
 
 @read_success:
 
@@ -133,12 +143,9 @@ _systemd:
     jmp      @again
 
     rts
-
  
 no_path:    
     print   str_failed,NOSAVE
-
-
 
 no_chars:
     print str_done,NOSAVE
@@ -354,8 +361,6 @@ run:
 .endproc
 
 
-
-
 .proc read_modules
 
     lda      #<path_modules
@@ -510,7 +515,7 @@ run:
     tax    
     rts
 set:
-    .byte 0,0,0,0,1,1,1,1
+    .byte 0,0,0,0,0,4,4,4
     .byte 1,1,1,1,1,1,1,1
     .byte 1,1,1,1,1,1,1,1
     .byte 1,1,1,1,1,1,1,1
@@ -521,7 +526,7 @@ set:
     .byte 5,6,6,6,6,7,7,7,7    
 
 bank:
-    .byte 1,2,3,4,1,1,1,1
+    .byte 1,1,2,3,4,5,6,7
     .byte 3,1,1,1,1,1,1,1
     .byte 3,1,1,1,1,1,1,1
     .byte 3,1,1,1,1,1,1,1
@@ -535,13 +540,17 @@ bank:
 .endproc
 
 
+
+
 .asciiz "/lib8/modules/2.4.17"
 
 command0_str:
         .ASCIIZ "systemd"
-
 command1_str:
-        .ASCIIZ "lsmod"
+       .ASCIIZ "twilconf"
+
+;command1_str:
+ ;       .ASCIIZ "lsmod"
 ;command2_str:        
 ;        .ASCIIZ "modprob"
 command3_str:
@@ -553,7 +562,7 @@ command5_str:
         .ASCIIZ "modinfo"
 
 commands_text:
-        .addr command0_str
+        ;.addr command0_str
         .addr command1_str
  ;       .addr command2_str        
         .addr command3_str        
@@ -561,8 +570,9 @@ commands_text:
         .addr command5_str
 
 commands_address:
-        .addr _systemd
-        .addr _lsmod
+        ;.addr _systemd
+   ;     .addr _twilconf
+        ;.addr _lsmod
        ; .addr _modprobe
         .addr _insmod
         .addr _rmmod
