@@ -1,24 +1,31 @@
+.include "../dependencies/ds1501-lib/src/include/ds1501.s"
+
 .define TWIL_INC_LOADED  twil_inc_loaded
 
 .define TWIL_MASK_REGISTER_VERSION 7
 
 .export _start_twilfirmware
 
+.define TWIL_INFO_ICON_ID         0
+.define TWIL_INFO_MEMORY_ID       1
+.define TWIL_ICON_CLOCK_ID        $0A
 
 .define TWIL_ACTION_MEMORY_MENU   $01
 .define TWIL_ACTION_UPGRADE_MENU  $02
 .define TWIL_ACTION_EXIT_FIRM2    $03
+.define TWIL_ACTION_CLOCK         $03 ; Firm 3
 
 
-.define TWIL_ACTION_EXIT_FIRM3    $02
 
-.define TWIL_ACTION_CLOCK         $04 ; Firm 3
+.define TWIL_ACTION_EXIT_FIRM3    $05
+
+
 .define TWIL_ACTION_NETWORK       $05 ; Firm 3
 
 .define TWIL_MAX_FIRMWARE_MENU_ICON 1
 
 .define TWILFIRM_MAX_MENU_ENTRY_FIRM_3 6
-.define TWILFIRM_MAX_MENU_ENTRY_FIRM_2 4
+.define TWILFIRM_MAX_MENU_ENTRY_FIRM_2 2 ; 0 to 3
 
 
 pos_current_letter_charset:=userzp
@@ -35,37 +42,38 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
 
     jsr     twil_interface_clear_menu 
 
+    ldx     #TWIL_INFO_ICON_ID
+    jsr     _blitIcon
+
+    ldx     #TWIL_ACTION_MEMORY_MENU
+    jsr     _blitIcon
+
+    ldx     #TWIL_ACTION_UPGRADE_MENU
+    jsr     _blitIcon
+
 
     lda     $342 ; Get version
     and     #TWIL_MASK_REGISTER_VERSION
     cmp     #$03
     beq     @version3
+    ; Firm 2
+    lda     #TWILFIRM_MAX_MENU_ENTRY_FIRM_2
+    sta     twil_max_menu_icon_firmware
 
 
-    ldx     #$00
-    jsr     _blitIcon
-
-    ldx     #$01
-    jsr     _blitIcon
-
-    ldx     #$02
-    jsr     _blitIcon
 
     
     ldx     #$07
     jsr     _blitIcon
     jmp     @run_menu
 @version3:
-    ldx     #$00
-    jsr     _blitIcon
-    
-    ldx     #$08
-    jsr     _blitIcon
+    lda     #TWILFIRM_MAX_MENU_ENTRY_FIRM_3
+    sta     twil_max_menu_icon_firmware
 
     ldx     #$09
     jsr     _blitIcon
 
-    ldx     #$0A
+    ldx     #TWIL_ICON_CLOCK_ID
     jsr     _blitIcon
 
 
@@ -98,7 +106,7 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     
 @go_right:
     ldx     twil_interface_current_menu
-    cpx     #TWIL_MAX_FIRMWARE_MENU_ICON
+    cpx     twil_max_menu_icon_firmware
     beq     @read_keyboard
 
     jsr     twil_interface_clear_menu
@@ -161,17 +169,22 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
 @version3:    
     lda     twil_interface_current_menu         ; Get current menu 
     beq     @display_menu_infos
+    cmp     #TWIL_ACTION_MEMORY_MENU
+    beq     @memory_menu
+    cmp     #TWIL_ACTION_UPGRADE_MENU
+    beq     @upgrade_menu
     cmp     #TWIL_ACTION_CLOCK
     beq     @clock_interface
-    cmp     #TWIL_ACTION_NETWORK
-    beq     @network_interface    
+    ;cmp     #TWIL_ACTION_NETWORK
+    ;beq     @network_interface    
     cmp     #TWIL_ACTION_EXIT_FIRM3
     beq     @exit_interface
     rts
 @network_interface:
-    lda     #$00
+    lda     #$01
     rts
 @clock_interface:
+    jsr     _twil_menu_clock
     lda     #$00
     rts    
 @exit_interface:
@@ -260,10 +273,13 @@ str_usb:
 
 .include "infos_menu/twil_menu_infos.s"
 .include "memory_menu/_twil_displays_banks.s"
+.include "clock_menu/_twil_menu_clock.s"
+
 .include "twil_interface_vars.s"
 .include "twil_interface_init.s"
 .include "twil_interface_change_menu.s"
 .include "twil_interface_clear_menu.s"
+
 
 .include "displayTwilighteBanner.s"
 .include "displayFrame.s"
@@ -280,13 +296,19 @@ str_default_storage:
 str_cpu:
     .asciiz "CPU                : "
 str_microdisc_register:
-    .asciiz "Microdisc register : YES"
+    .asciiz "Microdisc register : Yes"
 str_twilighte_rtc:
-    .asciiz "Real Time Clock    : YES"    
+    .asciiz "Real Time Clock    : Yes"    
 str_twilighte_battery:
-    .asciiz "On board battery   : YES"    
+    .asciiz "On board battery   : Yes"    
 str_twilighte_battery_level:
-    .asciiz "Battery level      : "        
+    .asciiz "Battery level      : " 
+str_twilighte_low:
+    .asciiz "Low" 
+str_twilighte_full:
+    .asciiz "Full"    
+str_twilighte_date:
+    .asciiz "Date : "
 str_ip_addr:
     .asciiz "IP : "
 
@@ -301,6 +323,9 @@ string_low:
     .byte   <str_ip_addr                    ; 6
     .byte   <str_twilighte_battery          ; 7
     .byte   <str_twilighte_battery_level    ; 8
+    .byte   <str_twilighte_date             ; 9
+    .byte   <str_twilighte_low              ; 10
+    .byte   <str_twilighte_full             ; 11
 
         
 
@@ -314,6 +339,9 @@ string_high:
     .byte   >str_ip_addr
     .byte   >str_twilighte_battery
     .byte   >str_twilighte_battery_level    
+    .byte   >str_twilighte_date
+    .byte   >str_twilighte_low              ; 10
+    .byte   >str_twilighte_full             ; 11    
 
 pos_string_low:
     .byte   <($BB80+40*7+2)  ; FIRMWARE
@@ -325,6 +353,10 @@ pos_string_low:
     .byte   <($BB80+40*7+2)  ; IP
     .byte   <($BB80+40*12+2) ; on board battery
     .byte   <($BB80+40*13+2) ; Battery level
+    .byte   <($BB80+40*7+2)  ; Date
+    .byte   <($BB80+40*13+23) ; State battery low
+    .byte   <($BB80+40*13+23)  ; state battery full
+
 
 pos_string_high:
     .byte   >($BB80+40*7+2)
@@ -336,6 +368,9 @@ pos_string_high:
     .byte   >($BB80+40*7+2)  ; Firmware
     .byte   >($BB80+40*12+2) ; on board battery
     .byte   >($BB80+40*13+2) ; Battery level
+    .byte   >($BB80+40*7+2)  ; Date
+    .byte   >($BB80+40*13+23) ; State battery low
+    .byte   >($BB80+40*13+23)  ; state battery full
 
 .proc _getcpu
     lda     #$00

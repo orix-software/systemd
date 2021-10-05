@@ -5,8 +5,6 @@
     sta     @__put_version+1
     stx     @__put_version+2
 
-    ldx     #$03            ; Microdisc register
-    jsr     printToFirmDisplay
 
     ; And GET VERSION
     lda     TWILIGHTE_REGISTER ; Get version
@@ -16,9 +14,16 @@
     sta     $bb80+120
 @__put_version:
     sta     $dead,y
-    cmp     #$03
-    bne     @not_firmware_3
-  
+
+    lda     TWILIGHTE_REGISTER ; Get version
+    and     #TWIL_MASK_REGISTER_VERSION
+
+    cmp     #$01
+    beq     @firm1
+    cmp     #$02
+    beq     @firm2
+    ; Firm 3
+
     ldx     #$04            ; 
     jsr     printToFirmDisplay
 
@@ -27,10 +32,27 @@
 
     ldx     #$08            ; Battery level 
     jsr     printToFirmDisplay
+    ; Check battery level
+
+    lda     DS1501_CTRLA_REGISTER
+    and     #%10000000
+    cmp     #%10000000
+    bne     @full
+
+    ldx     #$0A            ; Low
+    jsr     printToFirmDisplay
+    jmp     @full
+
+@full:
+    ldx     #$0B            ; Full
+    jsr     printToFirmDisplay
 
 
+@firm2:
+    ldx     #$03            ; Microdisc register
+    jsr     printToFirmDisplay
 
-@not_firmware_3:
+@firm1:
     ldx     #$02            ; Cpu
     jsr     printToFirmDisplay
     sta     @__put_cpu+1

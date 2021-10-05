@@ -1,4 +1,4 @@
-.define TWIL_COLOR_MENU_SELECTED   $05
+.define TWIL_COLOR_MENU_SELECTED   $06
 .define TWIL_COLOR_MENU_UNSELECTED $07
 
 .proc twil_interface_change_menu

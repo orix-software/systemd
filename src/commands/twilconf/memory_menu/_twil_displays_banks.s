@@ -1,16 +1,16 @@
     TRUE = 0
     FALSE = 1
  
-    save_bank := userzp+1	        ; one byte
-    save_twilighte_register    := userzp+2          ; 1 bytes
-    save_twilighte_banking_register    := userzp+3  ; 1 bytes
-    bank_decimal_current_bank := userzp+4 ; One byte
-    ptr_routine_bank:= userzp +5 ; 2 bytes
-    current_bank_tmp := userzp +7
-    ptr_display := userzp+9
-    ptr_signature := userzp+11
-    is_a_valid_rom:=userzp+13
-    switch_to_rom := userzp+14
+    save_bank                       := userzp+1	; 1 byte
+    save_twilighte_register         := userzp+2 ; 1 bytes
+    save_twilighte_banking_register := userzp+3 ; 1 bytes
+    bank_decimal_current_bank       := userzp+4 ; 1 byte
+    ptr_routine_bank                := userzp+5 ; 2 bytes
+    current_bank_tmp                := userzp+7
+    ptr_display                     := userzp+9
+    ptr_signature                   := userzp+11
+    is_a_valid_rom                  := userzp+13
+    switch_to_rom                   := userzp+14
 
 .proc _twil_displays_banks
 
@@ -29,7 +29,6 @@
     lda     ptr_routine_bank
     sta     __read_rom_info+1
     sta     __copy+1
-    
     sta     __copy2+1
     
     lda     ptr_routine_bank+1
@@ -49,7 +48,6 @@ __copy2:
     iny
     bne      loop
 
-
 	
     lda     #64
     sta     bank_decimal_current_bank
@@ -61,7 +59,6 @@ __copy2:
     ; switch to ram
     lda     TWILIGHTE_REGISTER
     sta     save_twilighte_register
-
 
     
     lda     #FALSE
@@ -96,8 +93,9 @@ __read_rom_info:
 
     jmp     restart
        
-@finished:    
-    mfree (ptr_routine_bank)
+@finished:  
+
+   ; mfree (ptr_routine_bank)
     lda     #$00
 
     rts
@@ -107,16 +105,8 @@ __read_rom_info:
 
 
 .proc routine_display_signature_into_ram
+
     sei
-
-    lda     bank_decimal_current_bank
-    cmp     #$06
-    bne     @skip
-
-    sta     $6000
-
-
-@skip:    
 
     jsr     _twil_get_registers_from_id_bank
 
@@ -129,6 +119,8 @@ __read_rom_info:
     ora     current_bank_tmp
     sta     VIA2::PRA
 
+
+
     lda     bank_decimal_current_bank
     cmp     #32   ; Does signature is in rom ?
     bcc     @rom
@@ -139,6 +131,7 @@ __read_rom_info:
     and     #%11011111
     sta     TWILIGHTE_REGISTER
 
+
     lda     $FFF8
     bne     @display_signature
     lda     $FFF9
@@ -146,6 +139,8 @@ __read_rom_info:
     beq     @no_signature
 
 @display_signature:
+
+
 
     lda     $FFF0 ; empty rom ?
     beq     @out
@@ -191,7 +186,3 @@ __read_rom_info:
     rts
 
 .endproc
-
-
-
-

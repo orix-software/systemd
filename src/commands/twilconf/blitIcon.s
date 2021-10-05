@@ -65,8 +65,8 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+20)
     .byte <($a000+POSY_ICON*40+18)  ; exit firm 2
     .byte <($a000+POSY_ICON*40+7)  ; Network firm v3
-    .byte <($a000+POSY_ICON*40+18) ; Exit firm v3
-    .byte <($a000+POSY_ICON*40+12) ; clock (firm3)
+    .byte <($a000+POSY_ICON*40+25) ; Exit firm v3
+    .byte <($a000+POSY_ICON*40+19) ; clock (firm3)
     
 icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+1)  ; Infos
@@ -78,8 +78,8 @@ icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+20)
     .byte >($a000+POSY_ICON*40+18)     ; Exit firm 2
     .byte >($a000+POSY_ICON*40+7)     ; Network
-    .byte >($a000+POSY_ICON*40+18)    ; Exit firm v3
-    .byte >($a000+POSY_ICON*40+12)    ; clock (firm3)
+    .byte >($a000+POSY_ICON*40+25)    ; Exit firm v3
+    .byte >($a000+POSY_ICON*40+19)    ; clock (firm3)
 
 icons_list_low:
     .byte <info_icon   ; 0

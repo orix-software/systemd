@@ -39,6 +39,8 @@ userzp := $80
     jmp     _start_twilfirmware
 ; $c006
     jmp     _start_twilsoft
+; $c00*
+    jmp     _start_twilmenubank
 
 _systemd:
 
@@ -64,6 +66,8 @@ _systemd:
 .include "commands/insmod.asm"
 .include "commands/twilconf/twilfirm.s"
 .include "commands/twilconf/twilsoft.s"
+.include "commands/twilconf/_start_twilmenubank.s"
+
 .include "strings.asm"
 
 .proc read_banks
@@ -82,21 +86,17 @@ _systemd:
     rts
 @found:
     ; fd_systemd is stored in open_file
-    malloc   1000           ; FIXME
+    malloc   1000,ptr1,str_oom           ; FIXME
     cpy      #$00
     bne      @continue
     cmp      #$00
     bne      @continue
-    print    str_oom,NOSAVE
+   
     rts
 
 @continue:
-
     sta      buffer
-    sta      ptr1
     sty      buffer+1
-    sty      ptr1+1
-
 	sta      PTR_READ_DEST
     sta      ptr3   ; for compute
 	sty      PTR_READ_DEST+1
@@ -142,7 +142,7 @@ _systemd:
     jsr      load_bank_routine
     jmp      @again
 
-    rts
+
  
 no_path:    
     print   str_failed,NOSAVE
@@ -159,8 +159,6 @@ no_chars:
     bne     @read ; not null then  start because we did not found a conf
     cmp     #$FF
     bne     @read ; not null then  start because we did not found a conf
-
-
 
     print   str_failed_word,NOSAVE
     BRK_KERNEL XCRLF 
@@ -240,9 +238,6 @@ no_chars:
 run:
     jmp (ptr2)
 .endproc
-
-
-
 
 .define MAX_LINE_SIZE_INI 100
 .proc read_inifile_section
