@@ -327,6 +327,15 @@ display_date:
 @up_year:
     inx
     inx
+    lda     CLOCK_POS_DATE,x
+    cmp     #'9'+$80
+    bne     @not_midnight
+    lda     CLOCK_POS_DATE+1,x
+    cmp     #'9'+$80
+    beq     @right_continue_finish
+    
+
+
     jmp     @not_midnight
 
 @up_month:
