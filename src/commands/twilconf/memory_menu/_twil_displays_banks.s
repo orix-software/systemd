@@ -144,6 +144,11 @@ __read_rom_info:
 
     lda     $FFF0 ; empty rom ?
     beq     @out
+    ; check if orix ROM ? 
+    lda     $FFFE
+    cmp     #$FA
+    bne     @out
+
     
     lda     $FFF8
     sta     ptr_signature
