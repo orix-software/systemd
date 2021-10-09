@@ -63,36 +63,42 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+7)    
     .byte <($a000+POSY_ICON*40+13)
     .byte <($a000+POSY_ICON*40+20)
-    .byte <($a000+POSY_ICON*40+18)  ; exit firm 2
+    .byte <($a000+POSY_ICON*40+18) ;  exit firm 2
     .byte <($a000+POSY_ICON*40+7)  ; Network firm v3
     .byte <($a000+POSY_ICON*40+25) ; Exit firm v3
     .byte <($a000+POSY_ICON*40+19) ; clock (firm3)
+    .byte <($a000+POSY_ICON*40+1)  ; Rom for launcher
+    .byte <($a000+POSY_ICON*40+7)  ; exit launcher
     
 icons_list_pos_high:
-    .byte >($a000+POSY_ICON*40+1)  ; Infos
-    .byte >($a000+POSY_ICON*40+7)    
-    .byte >($a000+POSY_ICON*40+13)
-    .byte >($a000+POSY_ICON*40+1)
-    .byte >($a000+POSY_ICON*40+7)    
-    .byte >($a000+POSY_ICON*40+13)
-    .byte >($a000+POSY_ICON*40+20)
-    .byte >($a000+POSY_ICON*40+18)     ; Exit firm 2
-    .byte >($a000+POSY_ICON*40+7)     ; Network
-    .byte >($a000+POSY_ICON*40+25)    ; Exit firm v3
-    .byte >($a000+POSY_ICON*40+19)    ; clock (firm3)
+    .byte >($a000+POSY_ICON*40+1)  ; 0 Infos
+    .byte >($a000+POSY_ICON*40+7)  ; 1  
+    .byte >($a000+POSY_ICON*40+13) ; 2
+    .byte >($a000+POSY_ICON*40+1)  ; 3
+    .byte >($a000+POSY_ICON*40+7)  ; 4  
+    .byte >($a000+POSY_ICON*40+13) ; 5
+    .byte >($a000+POSY_ICON*40+20) ; 6
+    .byte >($a000+POSY_ICON*40+18) ; 7     ; Exit firm 2
+    .byte >($a000+POSY_ICON*40+7)  ; 8   ; Network
+    .byte >($a000+POSY_ICON*40+25) ; 9   ; Exit firm v3
+    .byte >($a000+POSY_ICON*40+19) ; $0A   ; clock (firm3)
+    .byte >($a000+POSY_ICON*40+1)  ; $0B Rom for launcher
+    .byte >($a000+POSY_ICON*40+7)  ; $0C Exit launcher
 
 icons_list_low:
-    .byte <info_icon   ; 0
-    .byte <chip_icon            
-    .byte <reload_chip_icon ;6
-    .byte <joy_icon    
-    .byte <demo_icon        
-    .byte <tools_icon    
-    .byte <command_icon ; 1
-    .byte <exit_icon ; 1   
-    .byte <network_icon 
-    .byte <exit_icon ; 1 
-    .byte <clock_icon ; 1 
+    .byte <info_icon        ; 0
+    .byte <chip_icon        ; 1    
+    .byte <reload_chip_icon ; 2
+    .byte <joy_icon         ; 3
+    .byte <demo_icon        ; 4
+    .byte <tools_icon       ; 5
+    .byte <command_icon     ; 6
+    .byte <exit_icon        ; 7
+    .byte <network_icon     ; 8 
+    .byte <exit_icon        ; 9
+    .byte <clock_icon       ; $0A
+    .byte <chip_icon        ; $0B    
+    .byte <exit_icon        ; $0C
     
 icons_list_high:    
     .byte >info_icon
@@ -106,7 +112,8 @@ icons_list_high:
     .byte >network_icon 
     .byte >exit_icon 
     .byte >clock_icon 
-
+    .byte >chip_icon            
+    .byte >exit_icon 
 
 reload_chip_icon:
 .byt $40,$5C,$40,$40,$40

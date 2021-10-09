@@ -24,7 +24,7 @@
 
 .define TWIL_MAX_FIRMWARE_MENU_ICON 1
 
-.define TWILFIRM_MAX_MENU_ENTRY_FIRM_3 6
+.define TWILFIRM_MAX_MENU_ENTRY_FIRM_3 4
 .define TWILFIRM_MAX_MENU_ENTRY_FIRM_2 2 ; 0 to 3
 
 
@@ -129,13 +129,13 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     
     jsr     twil_interface_clear_menu
 
-    lda     #$01
-    jsr     twil_interface_change_menu    
+    ;lda     #$01
+    ;jsr     twil_interface_change_menu    
     
     dec     twil_interface_current_menu
 
-    lda     #$00
-    jsr     twil_interface_change_menu
+    ;lda     #$00
+    ;jsr     twil_interface_change_menu
 
     jsr     twilfirm_menu_management
 
@@ -185,8 +185,17 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     rts
 @clock_interface:
     jsr     _twil_menu_clock
+    ; Clock menu get keyboard, then this is missing here then manage here case left or right
+    cmp     #$08
+    beq     @exit_interface_from_clock
+    cmp     #$09
+    beq     @display_menu_upgrade_from_clock
     lda     #$00
-    rts    
+    rts
+@exit_interface_from_clock:
+    jsr     twil_interface_change_menu
+    inc     twil_interface_current_menu         
+    jsr     twil_interface_change_menu
 @exit_interface:
     ldx     #$05
     jsr     printToFirmDisplay
@@ -204,6 +213,10 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     lda     #$00
     rts
 
+@display_menu_upgrade_from_clock:
+    jsr     twil_interface_change_menu
+    dec     twil_interface_current_menu         
+    jsr     twil_interface_change_menu
 @display_menu_upgrade:
     jsr     twil_menu_upgrade
     lda     #$00

@@ -12,7 +12,11 @@
     lda     #<loader_banner
     sta     @__modify1+1
     lda     #>loader_banner
-    sta     @__modify1+2    
+    sta     @__modify1+2
+    lda     #<($a000+12)
+    sta     @__modify2+1
+    lda     #>($a000+12)
+    sta     @__modify2+2
     lda     #18
     sta     @__size1+1
     sta     @__size2+1

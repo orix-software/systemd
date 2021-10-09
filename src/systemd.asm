@@ -8,7 +8,7 @@
 .define TWIL_INTERFACE_NUMBER_OF_RAM_BANK       32
 .define TWIL_INTERFACE_NUMBER_OF_CHARS_IN_LABEL 8
 
-userzp := $80
+    userzp := $80
 
 
     fd_systemd := userzp
@@ -382,7 +382,7 @@ run:
 .proc open_file
     sta      ptr2
     sty      ptr2+1
-    malloc   100,str_oom ; [,oom_msg_ptr] [,fail_value]
+    malloc   100,ptr1,str_oom ; [,oom_msg_ptr] [,fail_value]
     cpy      #$00
     bne      @continue
     cmp      #$00
@@ -427,9 +427,6 @@ run:
     mfree(ptr1)
     rts
 .endproc
-
-
-
 
 .proc twil_copy_buffer_to_ram_bank
 

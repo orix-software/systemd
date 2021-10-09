@@ -101,9 +101,6 @@ __read_rom_info:
     rts
 .endproc
 
-
-
-
 .proc routine_display_signature_into_ram
 
     sei
@@ -113,13 +110,10 @@ __read_rom_info:
     stx     TWILIGHTE_BANKING_REGISTER
     sta     current_bank_tmp
 
-
     lda     VIA2::PRA
     and     #%11111000
     ora     current_bank_tmp
     sta     VIA2::PRA
-
-
 
     lda     bank_decimal_current_bank
     cmp     #32   ; Does signature is in rom ?
@@ -130,7 +124,6 @@ __read_rom_info:
  
     and     #%11011111
     sta     TWILIGHTE_REGISTER
-
 
     lda     $FFF8
     bne     @display_signature
