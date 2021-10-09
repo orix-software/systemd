@@ -58,6 +58,8 @@ code: $(SOURCE)
 srccode: $(SOURCE)
 	mkdir -p build/usr/src/$(PROGRAM)/
 	mkdir -p build/usr/src/$(PROGRAM)/src/
+	mkdir -p build/etc/$(PROGRAM)
+	cp -adpR usr/* build/usr/
 	cp configure build/usr/src/$(PROGRAM)/
 	cp Makefile build/usr/src/$(PROGRAM)/
 	cp README.md build/usr/src/$(PROGRAM)/	
