@@ -63,7 +63,7 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+7)    
     .byte <($a000+POSY_ICON*40+13)
     .byte <($a000+POSY_ICON*40+20)
-    .byte <($a000+POSY_ICON*40+18) ;  exit firm 2
+    .byte <($a000+POSY_ICON*40+7) ;  exit firm 2
     .byte <($a000+POSY_ICON*40+7)  ; Network firm v3
     .byte <($a000+POSY_ICON*40+25) ; Exit firm v3
     .byte <($a000+POSY_ICON*40+19) ; clock (firm3)
@@ -78,9 +78,9 @@ icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+7)  ; 4  
     .byte >($a000+POSY_ICON*40+13) ; 5
     .byte >($a000+POSY_ICON*40+20) ; 6
-    .byte >($a000+POSY_ICON*40+18) ; 7     ; Exit firm 2
-    .byte >($a000+POSY_ICON*40+7)  ; 8   ; Network
-    .byte >($a000+POSY_ICON*40+25) ; 9   ; Exit firm v3
+    .byte >($a000+POSY_ICON*40+7) ; 7 Exit firm 2
+    .byte >($a000+POSY_ICON*40+7)  ; 8 Network
+    .byte >($a000+POSY_ICON*40+25) ; 9 Exit firm v3
     .byte >($a000+POSY_ICON*40+19) ; $0A   ; clock (firm3)
     .byte >($a000+POSY_ICON*40+1)  ; $0B Rom for launcher
     .byte >($a000+POSY_ICON*40+7)  ; $0C Exit launcher

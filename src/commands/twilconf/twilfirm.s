@@ -12,7 +12,7 @@
 
 .define TWIL_ACTION_MEMORY_MENU   $01
 .define TWIL_ACTION_UPGRADE_MENU  $02
-.define TWIL_ACTION_EXIT_FIRM2    $03
+.define TWIL_ACTION_EXIT_FIRM2    $01
 .define TWIL_ACTION_CLOCK         $03 ; Firm 3
 
 
@@ -45,11 +45,11 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     ldx     #TWIL_INFO_ICON_ID
     jsr     _blitIcon
 
-    ldx     #TWIL_ACTION_MEMORY_MENU
-    jsr     _blitIcon
+    ;ldx     #TWIL_ACTION_MEMORY_MENU
+    ;jsr     _blitIcon
 
-    ldx     #TWIL_ACTION_UPGRADE_MENU
-    jsr     _blitIcon
+    ;ldx     #TWIL_ACTION_UPGRADE_MENU
+    ;jsr     _blitIcon
 
 
     lda     $342 ; Get version
@@ -59,9 +59,6 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     ; Firm 2
     lda     #TWILFIRM_MAX_MENU_ENTRY_FIRM_2
     sta     twil_max_menu_icon_firmware
-
-
-
     
     ldx     #$07
     jsr     _blitIcon
@@ -80,7 +77,7 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
 @run_menu:
     jsr     twilfirm_menu_management
 
-@read_keyboard:
+read_keyboard:
 
     BRK_TELEMON XRDW0            ; read keyboard
 
@@ -101,13 +98,13 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     cmp     #$09
     beq     @go_right
     cmp     #$08
-    beq     @go_left
-    jmp     @read_keyboard
+    beq     go_left_twilfirm
+    jmp     read_keyboard
     
 @go_right:
     ldx     twil_interface_current_menu
     cpx     twil_max_menu_icon_firmware
-    beq     @read_keyboard
+    beq     read_keyboard
 
     jsr     twil_interface_clear_menu
     
@@ -122,26 +119,34 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     jsr     twilfirm_menu_management ; it return 1 if there is an action to exit
     cmp     #$01
     beq     @exit
-    jmp     @read_keyboard
-@go_left:
+    jmp     read_keyboard
+
+
+go_left_twilfirm:
     ldx     twil_interface_current_menu
-    beq     @read_keyboard
+    beq     @exit_go_left_twilfirm
     
     jsr     twil_interface_clear_menu
 
-    ;lda     #$01
-    ;jsr     twil_interface_change_menu    
+    lda     #$01
+    jsr     twil_interface_change_menu    
     
     dec     twil_interface_current_menu
 
-    ;lda     #$00
-    ;jsr     twil_interface_change_menu
+    lda     #$00
+    jsr     twil_interface_change_menu
 
     jsr     twilfirm_menu_management
+    cmp     #$01
+    bne     @exit_go_left_twilfirm
+        ; restore chars
+     
 
-    jmp     @read_keyboard
+    rts
+@exit_go_left_twilfirm:
+    jmp     read_keyboard
+.endproc    
 
-.endproc  
 
 .proc   twilfirm_menu_management
     
@@ -153,17 +158,18 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
 
     lda     twil_interface_current_menu         ; Get current menu 
     beq     @display_menu_infos
-    cmp     #TWIL_ACTION_MEMORY_MENU
-    beq     @memory_menu
-    cmp     #TWIL_ACTION_UPGRADE_MENU
-    beq     @upgrade_menu
+    ;cmp     #TWIL_ACTION_MEMORY_MENU
+    ;beq     @memory_menu
+    ;cmp     #TWIL_ACTION_UPGRADE_MENU
+    ;beq     @upgrade_menu
     cmp     #TWIL_ACTION_EXIT_FIRM2
     beq     @exit_interface
-
     rts
+
+
 @memory_menu:    
     jmp     _twil_displays_banks    
-    rts
+
 @upgrade_menu:
     rts    
 @version3:    
@@ -199,12 +205,32 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
 @exit_interface:
     ldx     #$05
     jsr     printToFirmDisplay
+@wait_key_for_exit:    
     BRK_TELEMON XRDW0 
     cmp     #13
     beq     @exit_interface_confirmed
+    cmp     #$08
+   
+    bne     @wait_key_for_exit
+    jsr     twil_interface_clear_menu
+
+    lda     #$01
+    jsr     twil_interface_change_menu    
+    
+    dec     twil_interface_current_menu
+
     lda     #$00
-    rts
+    jsr     twil_interface_change_menu
+
+    jmp     twilfirm_menu_management
+
+
+
 @exit_interface_confirmed:    
+    ; restore chars 
+	BRK_KERNEL XHIRES ; Hires
+	BRK_KERNEL XTEXT  ; and text
+	BRK_KERNEL XSCRNE
     lda     #$01
     rts
 
