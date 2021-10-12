@@ -39,8 +39,6 @@
     jmp     _start_twilfirmware
 ; $c006
     jmp     _start_twilsoft
-; $c00*
-    jmp     _start_twilmenubank
 
 _systemd:
 
@@ -576,9 +574,11 @@ commands_version:
 	
 ; ----------------------------------------------------------------------------
 ; Copyrights address
+.res $FFED-*
+magic_token_systemd:
+        .byte "SYS"
+        
 
-        .res $FFF0-*
-        .org $FFF0
 ; $fff0
 ; $00 : empty ROM
 ; $01 : command ROM
