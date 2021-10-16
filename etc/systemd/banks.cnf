@@ -1,0 +1,12 @@
+[Atmos(usbdrive)]
+path=/usr/share/basic11/basicus1.rom
+[Atmos(sdcard)]
+path=/usr/share/basic11/basicsd1.rom
+[Oric-1(usbdrive)]
+path=/usr/share/basic10/basicus2.rom
+[Oric-1(sdcard)]
+path=/usr/share/basic10/basicsd2.rom
+[Pravetz(usbdrive)]
+path=/usr/share/pravetzt/pravus1.rom
+[Pravetz(sdcard)]
+path=/usr/share/pravetzt/pravsd1.rom

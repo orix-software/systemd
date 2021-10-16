@@ -22,7 +22,7 @@ str_oom:
 rom_signature:
 	.byte   "Systemd " ; Space must be present
 version:    
-    .asciiz "v2021.3"
+    .asciiz "v2021.4"
 
 str_bank: 
     .asciiz "  "
@@ -37,7 +37,7 @@ str_nothing_to_read:
 path_modules:    
     .asciiz "/etc/systemd/modules"	
 path_banks:    
-    .asciiz "/etc/systemd/banks"	
+    .asciiz "/etc/systemd/banks.cnf"	
 
 str_path_rom:
     .asciiz "/usr/share/systemd/systemd.rom"    
