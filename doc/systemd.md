@@ -2,11 +2,10 @@
 
 Systemd is located in /usr/share/systemd folder (systemd.rom).
 
-## requires
+## Requires
 
-This roms requires at least Orix 2021.4 (kernel : 2021.4 and Shell0 2021.4)
+This roms requires at least Orix 2021.4 (kernel : 2021.4 and Shell : 2021.4)
 Systemd.rom must be in /usr/share/systemd folder (systemd.rom) and can be downloaded here : http://repo.orix.oric.org/dists/official/tgz/6502/systemd.tgz
-
 
 ## Twilighte setup
 
@@ -24,7 +23,7 @@ It displays informations as :
 
 ## Twilighte loader
 
-Uses funct L T to launch the menu
+Uses funct + T to launch the menu
 
 ![alt text](loader.jpg "firmware")
 
