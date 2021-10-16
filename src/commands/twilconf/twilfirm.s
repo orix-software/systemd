@@ -329,19 +329,21 @@ str_would_you_like_to_exit:
     .asciiz "Press enter to return to shell"
 
 str_twilighte_firmware_version:
-    .asciiz "Firmware version   : "    
+    .asciiz "Firmware version     : "    
 str_default_storage:
-    .asciiz "Default storage    : "
+    .asciiz "Default storage      : "
+str_usb_controller_firmware:
+    .asciiz "Usb firmware version : "    
 str_cpu:
-    .asciiz "CPU                : "
+    .asciiz "CPU                  : "
 str_microdisc_register:
-    .asciiz "Microdisc register : Yes"
+    .asciiz "Microdisc register   : Yes"
 str_twilighte_rtc:
-    .asciiz "Real Time Clock    : Yes"    
+    .asciiz "Real Time Clock      : Yes"    
 str_twilighte_battery:
-    .asciiz "On board battery   : Yes"    
+    .asciiz "On board battery     : Yes"    
 str_twilighte_battery_level:
-    .asciiz "Battery level      : " 
+    .asciiz "Battery level        : " 
 str_twilighte_low:
     .asciiz "Low" 
 str_twilighte_full:
@@ -365,6 +367,7 @@ string_low:
     .byte   <str_twilighte_date             ; 9
     .byte   <str_twilighte_low              ; 10
     .byte   <str_twilighte_full             ; 11
+    .byte   <str_usb_controller_firmware    ; 12
 
         
 
@@ -381,35 +384,38 @@ string_high:
     .byte   >str_twilighte_date
     .byte   >str_twilighte_low              ; 10
     .byte   >str_twilighte_full             ; 11    
+    .byte   >str_usb_controller_firmware    ; 12
 
 pos_string_low:
     .byte   <($BB80+40*7+2)  ; FIRMWARE
     .byte   <($BB80+40*9+2)  ; Default storage
     .byte   <($BB80+40*8+2)  ; CPU
-    .byte   <($BB80+40*10+2) ; Microdisc register
-    .byte   <($BB80+40*11+2) ; RTC
+    .byte   <($BB80+40*11+2) ; Microdisc register
+    .byte   <($BB80+40*14+2) ; RTC
     .byte   <($BB80+40*7+2)  ; Exit
     .byte   <($BB80+40*7+2)  ; IP
     .byte   <($BB80+40*12+2) ; on board battery
     .byte   <($BB80+40*13+2) ; Battery level
     .byte   <($BB80+40*7+2)  ; Date
-    .byte   <($BB80+40*13+23) ; State battery low
-    .byte   <($BB80+40*13+23)  ; state battery full
+    .byte   <($BB80+40*13+25) ; State battery low
+    .byte   <($BB80+40*13+25)  ; state battery full
+    .byte   <($BB80+40*10+2) ; usb version
 
 
 pos_string_high:
     .byte   >($BB80+40*7+2)
     .byte   >($BB80+40*9+2)
     .byte   >($BB80+40*8+2)
-    .byte   >($BB80+40*10+2)
-    .byte   >($BB80+40*11+2) ; RTC
+    .byte   >($BB80+40*11+2)
+    .byte   >($BB80+40*14+2) ; RTC
     .byte   >($BB80+40*7+2)  ; Exit
     .byte   >($BB80+40*7+2)  ; Firmware
     .byte   >($BB80+40*12+2) ; on board battery
     .byte   >($BB80+40*13+2) ; Battery level
     .byte   >($BB80+40*7+2)  ; Date
-    .byte   >($BB80+40*13+23) ; State battery low
-    .byte   >($BB80+40*13+23)  ; state battery full
+    .byte   >($BB80+40*13+25) ; State battery low
+    .byte   >($BB80+40*13+25)  ; state battery full
+    .byte   >($BB80+40*10+2)  ; usb version
 
 .proc _getcpu
     lda     #$00

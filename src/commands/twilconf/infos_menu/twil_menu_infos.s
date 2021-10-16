@@ -1,10 +1,19 @@
 
+CH376_GET_IC_VER      = $01
+
 .proc   twil_menu_infos
     ldx     #$00            ; Firmware version
     jsr     printToFirmDisplay
     sta     @__put_version+1
     stx     @__put_version+2
 
+    ldx     #$0C               ; Firmware version
+    jsr     printToFirmDisplay
+
+    jsr     _ch376_ic_get_ver
+    clc     
+    adc     #$30
+    sta     $bb80+40*10+25
 
     ; And GET VERSION
     lda     TWILIGHTE_REGISTER ; Get version
@@ -23,6 +32,8 @@
     cmp     #$02
     beq     @firm2
     ; Firm 3
+
+
 
     ldx     #$04            ; 
     jsr     printToFirmDisplay
@@ -140,3 +151,12 @@
 
     rts    
 .endproc
+
+.proc _ch376_ic_get_ver
+    lda     #CH376_GET_IC_VER
+    sta     CH376_COMMAND
+    lda     CH376_DATA
+    and     #%00111111 ; A contains revision
+
+    rts
+.endproc    

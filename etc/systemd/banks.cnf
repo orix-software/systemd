@@ -10,5 +10,5 @@ path=/usr/share/basic10/basicsd2.rom
 path=/usr/share/pravetzt/pravus1.rom
 [Pravetz(sdcard)]
 path=/usr/share/pravetzt/pravsd1.rom
-[Dflat 1.13(real tape)]
+[Dflat 0.13(real tape)]
 path=/usr/share/dflat/dflat.rom

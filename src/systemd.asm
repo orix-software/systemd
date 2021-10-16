@@ -38,6 +38,7 @@
 ; $c003
     jmp     _start_twilfirmware
 ; $c006
+    
     jmp     _start_twilsoft
 
 _systemd:
@@ -571,14 +572,9 @@ commands_version:
         .ASCIIZ "0.0.1"
 
 
-	
-; ----------------------------------------------------------------------------
-; Copyrights address
 .res $FFED-*
 magic_token_systemd:
         .byte "SYS"
-        
-
 ; $fff0
 ; $00 : empty ROM
 ; $01 : command ROM
