@@ -4,3 +4,6 @@
 [submodule "dependencies/ds1501-lib"]
 	path = dependencies/ds1501-lib
 	url = https://github.com/orix-software/ds1501-lib.git
+[submodule "dependencies/ch395-lib"]
+	path = dependencies/ch395-lib
+	url = https://github.com/orix-software/ch395-lib.git
