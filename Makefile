@@ -58,13 +58,15 @@ code: $(SOURCE)
 srccode: $(SOURCE)
 	mkdir -p build/usr/src/$(PROGRAM)/
 	mkdir -p build/usr/share/$(PROGRAM)/
+	mkdir -p build/usr/share/$(PROGRAM)/roms/
 	mkdir -p build/etc/$(PROGRAM)
 	cp -adpR usr/* build/usr/
 	cp configure build/usr/src/$(PROGRAM)/
 	cp Makefile build/usr/src/$(PROGRAM)/
 	cp README.md build/usr/src/$(PROGRAM)/	
 	cp -adpR src/* build/usr/src/$(PROGRAM)/
-	cp etc/banks.cnf build/etc/systemd/
+	cp etc/systemd/banks.cnf build/etc/systemd/
+	cp usr/share/$(PROGRAM)/roms/*.rom build/usr/share/$(PROGRAM)/roms/
 
 test:
 	mkdir -p build/usr/share/$(PROGRAM)/
