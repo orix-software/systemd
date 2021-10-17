@@ -64,6 +64,7 @@ srccode: $(SOURCE)
 	cp Makefile build/usr/src/$(PROGRAM)/
 	cp README.md build/usr/src/$(PROGRAM)/	
 	cp -adpR src/* build/usr/src/$(PROGRAM)/
+	cp etc/banks.cnf build/etc/systemd/
 
 test:
 	mkdir -p build/usr/share/$(PROGRAM)/
