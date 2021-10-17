@@ -10,3 +10,5 @@ path=/usr/share/basic10/basicsd2.rom
 path=/usr/share/pravetzt/pravus1.rom
 [Pravetz(sdcard)]
 path=/usr/share/pravetzt/pravsd1.rom
+[Dflat 0.13(Real hardtape)]
+path=/usr/share/systemd/roms/dflat013.rom

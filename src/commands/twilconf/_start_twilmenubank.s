@@ -137,6 +137,8 @@ BANK_LABEL=($BB80+40*7+2)
     sta     fd_systemd
     stx     fd_systemd+1
 
+
+
     ;Malloc 512 for routine + buffer 16384
     malloc   16896,ptr2,str_oom ; Malloc for the routine to copy into memory, but also the 16KB of the bank to load
     lda      ptr2  ;
@@ -178,7 +180,7 @@ BANK_LABEL=($BB80+40*7+2)
     jmp     run
 
 run:
-    jmp (ptr2)
+    jmp    (ptr2)
 .endproc
 
 
@@ -202,6 +204,10 @@ run:
     cpx     #64
     bne     @loop
     ; then execute
+
+    lda     #%01111111
+    sta     $32E
+
     lda     $FFFC
     sta     $00
     lda     $FFFD
