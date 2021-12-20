@@ -25,12 +25,6 @@ index_software      := userzp+12 ; Table which contains the ptr of each software
 id_current_software := userzp+14 ; Word
 index_software_ptr  := userzp+16 ;  ptr computre
 
-.struct loader_struct
-  key_software_index_low              .res LOADER_MAX_SOFTWARE_BY_CATEGORY
-  key_software_index_high             .res LOADER_MAX_SOFTWARE_BY_CATEGORY
-  software_key_to_launch_low          .res 1
-  software_key_to_launch_high         .res 1
-.endstruct
 
 
 .proc _loader
@@ -59,6 +53,7 @@ index_software_ptr  := userzp+16 ;  ptr computre
     jsr     _blitIcon
 
 @start_menu_bank:
+    jsr     twil_interface_clear_menu
     jsr     _start_twilmenubank
     cmp     #TWIL_KEYBOARD_ESC
     beq     @exit_loader
@@ -74,15 +69,26 @@ index_software_ptr  := userzp+16 ;  ptr computre
     lda     #$00
     sta     software_menu_id
 
+    lda     #$00
+    sta     twil_interface_current_menu   
+
     lda     #TWIL_SWITCH_ON_ICON
     jsr     twil_interface_change_menu
     jsr     twil_interface_clear_menu
 
     jsr     @display_menu_loader_software
+    
+    cmp     #TWIL_KEYBOARD_LEFT
+    beq     @switch_to_menu_bank
+
     cmp     #TWIL_KEYBOARD_RIGHT
     bne     @check_right_demo
     inc     twil_interface_current_menu
     jmp     @game_menu
+@switch_to_menu_bank:
+    lda     #TWIL_SWITCH_OFF_ICON
+    jsr     twil_interface_change_menu
+    jmp     @start_menu_bank 
 @check_right_demo:    
 
 
@@ -101,15 +107,25 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
     jsr     twil_interface_clear_menu
     jsr     @display_menu_loader_software
+
     cmp     #TWIL_KEYBOARD_RIGHT
-    bne     @check_right_game
+    beq     @check_right_game
+    cmp     #TWIL_KEYBOARD_LEFT
+    beq     @check_left_game
+
     inc     twil_interface_current_menu
     jmp     @tools_menu
 
 @check_right_game:    
-    dec     twil_interface_current_menu
+    inc     twil_interface_current_menu
     jmp     @tools_menu    
-    rts        
+@check_left_game:    
+    lda     #TWIL_SWITCH_OFF_ICON
+    jsr     twil_interface_change_menu
+
+    jmp     @demo_menu    
+  
+
 @tools_menu:
     lda     #$02
     sta     software_menu_id
@@ -124,12 +140,17 @@ index_software_ptr  := userzp+16 ;  ptr computre
     jsr     @display_menu_loader_software
     cmp     #TWIL_KEYBOARD_RIGHT
     beq     @exit_menu 
-    cmp     #$08
+    cmp     #TWIL_KEYBOARD_LEFT
     bne     @check_esc_tools_menu 
-    lda     #$05
-    sta     twil_interface_current_menu    
+
     lda     #$00
     jsr     twil_interface_change_menu
+
+    ;lda     #$05
+    ;sta     twil_interface_current_menu    
+    ;lda     #$01
+    ;sta     software_menu_id
+    
 
 
     
@@ -484,7 +505,7 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
 
 @wait_keyboard:
-    jsr     debug_loader   
+    ;jsr     debug_loader   
     
     BRK_KERNEL XRDW0
     cmp     #TWIL_KEYBOARD_LEFT
