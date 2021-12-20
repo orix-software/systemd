@@ -1,6 +1,6 @@
 
-.define MENU_BANK_LOADER $01
-.define BANK_BAR_COLOR $11
+.define MENU_BANK_LOADER    $01
+.define BANK_BAR_COLOR      $11
 
 .define MAX_BANK_TO_DISPLAY 20
 
@@ -63,9 +63,9 @@ BANK_LABEL=($BB80+40*7+2)
     jsr     _missing_file
     ldx     pos_y_bar
     lda     tab_path_bank_low,x
-    sta     buffer
+    sta     ptr1
     lda     tab_path_bank_high,x
-    sta     buffer+1
+    sta     ptr1+1
     jmp     load_bank_routine_menu_bank    
     
     
@@ -120,7 +120,7 @@ BANK_LABEL=($BB80+40*7+2)
 .endproc
 
 .proc load_bank_routine_menu_bank
-    fopen  (buffer), O_RDONLY
+    fopen  (ptr1), O_RDONLY
     cpx     #$FF
     bne     @read ; not null then  start because we did not found a conf
     cmp     #$FF
@@ -129,7 +129,7 @@ BANK_LABEL=($BB80+40*7+2)
     print   str_failed_word,NOSAVE
     BRK_KERNEL XCRLF 
     print   str_error_path_not_found
-    print   (buffer)
+    print   (ptr1)
     BRK_KERNEL XCRLF
     rts
     
@@ -206,7 +206,7 @@ run:
     ; then execute
 
     lda     #%01111111
-    sta     $32E
+    sta     $30E
 
     lda     $FFFC
     sta     $00
@@ -216,54 +216,6 @@ run:
     jmp     ($0000)
 .endproc
 
-.proc open_file_bank_launcher
-    sta      ptr2
-    sty      ptr2+1
-    malloc   100,ptr1,str_oom ; [,oom_msg_ptr] [,fail_value]
-    cpy      #$00
-    bne      @continue
-    cmp      #$00
-    bne      @continue
-
-    rts
-@continue:
-    sta     ptr1
-    sty     ptr1+1
-
-    
-
-    ldy     #$00
-@loop4:    
-    lda     (ptr2),y
-    beq     @out
-    sta     (ptr1),y
-    iny
-    bne     @loop4
-    
-@out:
-    sta     (ptr1),y
-    
-
-
-    fopen (ptr1), O_RDONLY
-
-    cpx     #$FF
-    bne     @read ; not null then  start because we did not found a conf
-    cmp     #$FF
-    bne     @read ; not null then  start because we did not found a conf
-    jsr     _missing_file
-   ; print   str_failed,NOSAVE
-
-    
-    mfree(ptr1)
-    rts
-@read:
-    sta     fd_systemd
-    stx     fd_systemd+1
-    
-    mfree(ptr1)
-    rts
-.endproc
 
 .proc _missing_file
 	BRK_KERNEL XHIRES ; Hires
@@ -294,6 +246,7 @@ run:
     bne      @continue
     cmp      #$00
     bne      @continue
+    mfree    (ptr1)
 
     rts
 
@@ -461,7 +414,6 @@ MAX_LINE_SIZE_INI=100
 MAX_LINE_SIZE_INI=100
 
 
-
     ldx      #$00
     ldy      #$00
 @L1:    
@@ -519,7 +471,6 @@ MAX_LINE_SIZE_INI=100
     sta      tab_path_bank_low,x
     lda      buffer+1
     sta      tab_path_bank_high,x
-
 
     rts
 

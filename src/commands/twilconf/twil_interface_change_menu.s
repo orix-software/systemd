@@ -1,6 +1,8 @@
 .define TWIL_COLOR_MENU_SELECTED   $06
 .define TWIL_COLOR_MENU_UNSELECTED $07
 
+; A=0 menu is set to the right color
+
 .proc twil_interface_change_menu
 
     cmp     #$00

@@ -7,14 +7,25 @@
 .export _start_twilfirmware
 
 .define TWIL_INFO_ICON_ID         0
-.define TWIL_INFO_MEMORY_ID       1
+.define TWIL_INFO_MEMORY_ID       $01
+.define TWIL_ICON_GAME            $03 
+.define TWIL_ICON_DEMO            $04
+.define TWIL_ICON_TOOLS           $05
 .define TWIL_ICON_CLOCK_ID        $0A
+.define TWIL_ICON_ROM_ID          $0B
+.define TWIL_ICON_EXIT_LOADER     $0C
+
+.define TWIL_SWITCH_OFF_ICON      $00
+.define TWIL_SWITCH_ON_ICON       $01
 
 .define TWIL_ACTION_MEMORY_MENU   $01
 .define TWIL_ACTION_UPGRADE_MENU  $02
 .define TWIL_ACTION_EXIT_FIRM2    $01
-.define TWIL_ACTION_CLOCK         $03 ; Firm 3
+.define TWIL_ACTION_CLOCK         $02 ; Firm 3
 
+.define TWIL_KEYBOARD_LEFT        $08
+.define TWIL_KEYBOARD_RIGHT       $09
+.define TWIL_KEYBOARD_ESC         27
 
 
 .define TWIL_ACTION_EXIT_FIRM3    $05
@@ -28,10 +39,12 @@
 .define TWILFIRM_MAX_MENU_ENTRY_FIRM_2 2 ; 0 to 3
 
 
+; Don't use userzp+4 !!! It's a malloc for return routine in twilbank of shell command (when funct + T and funct +L are pressed)
+
 pos_current_letter_charset:=userzp
 pos_text_hires:=userzp+2
 
-twilfirm_ptr2:= userzp+4
+twilfirm_ptr2:= userzp+6
 
 twil_get_bank_empty_ptr1:=twilfirm_ptr2
 
@@ -45,8 +58,8 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     ldx     #TWIL_INFO_ICON_ID
     jsr     _blitIcon
 
-    ;ldx     #TWIL_ACTION_MEMORY_MENU
-    ;jsr     _blitIcon
+    ldx     #TWIL_ACTION_MEMORY_MENU
+    jsr     _blitIcon
 
     ;ldx     #TWIL_ACTION_UPGRADE_MENU
     ;jsr     _blitIcon
@@ -177,8 +190,8 @@ go_left_twilfirm:
     beq     @display_menu_infos
     cmp     #TWIL_ACTION_MEMORY_MENU
     beq     @memory_menu
-    cmp     #TWIL_ACTION_UPGRADE_MENU
-    beq     @upgrade_menu
+    ;cmp     #TWIL_ACTION_UPGRADE_MENU
+    ;beq     @upgrade_menu
     cmp     #TWIL_ACTION_CLOCK
     beq     @clock_interface
     ;cmp     #TWIL_ACTION_NETWORK
@@ -283,15 +296,11 @@ go_left_twilfirm:
 .endproc
 
 .proc   twil_menu_bank
-
     jsr     read_banks
-    ;lda     #$11
-    ;sta    $bb80
     rts
 .endproc
 
 .proc   twil_menu_upgrade
-
     rts
 .endproc
 
@@ -310,19 +319,20 @@ str_sdcard:
 str_usb:
     .asciiz "USB"    
 
-.include "infos_menu/twil_menu_infos.s"
-.include "memory_menu/_twil_displays_banks.s"
-.include "clock_menu/_twil_menu_clock.s"
+.include "../twilconf/infos_menu/twil_menu_infos.s"
+.include "../twilconf/memory_menu/_twil_displays_banks.s"
+.include "../twilconf/clock_menu/_twil_menu_clock.s"
 
-.include "twil_interface_vars.s"
-.include "twil_interface_init.s"
-.include "twil_interface_change_menu.s"
-.include "twil_interface_clear_menu.s"
+.include "../twilconf/twil_interface_vars.s"
+.include "../common/twil_interface_init.s"
+.include "../twilconf/twil_interface_change_menu.s"
+.include "../twilconf/twil_interface_clear_menu.s"
 
 
-.include "displayTwilighteBanner.s"
-.include "displayFrame.s"
-.include "blitIcon.s"
+.include "../twilconf/displayTwilighteBanner.s"
+.include "../common/displayFrame.s"
+.include "../common/blitIcon.s"
+.include "../common/doscrollupinframe.s"
 
 
 str_would_you_like_to_exit:

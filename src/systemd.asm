@@ -1,29 +1,38 @@
-.include   "../dependencies/orix-sdk/macros/SDK.mac"
+;.include   "../dependencies/orix-sdk/macros/SDK.mac"
+.include   "../dependencies/orix-sdk/macros/strnxxx.mac"
+.include   "../dependencies/orix-sdk/macros/SDK_print.mac"
+.include   "../dependencies/orix-sdk/macros/SDK_memory.mac"
+.include   "../dependencies/orix-sdk/macros/SDK_file.mac"
+
 .include   "../libs/usr/arch/include/twil.inc"
 
 .include   "telestrat.inc"
 .include   "fcntl.inc"
 .include   "cpu.mac"
+.include   "errno.inc"
 
 .define TWIL_INTERFACE_NUMBER_OF_RAM_BANK       32
 .define TWIL_INTERFACE_NUMBER_OF_CHARS_IN_LABEL 8
 
     userzp := $80
 
+    
 
-    fd_systemd := userzp
-    buffer := userzp+2
-    ptr1 := userzp+4
-    ptr2 := userzp+6
-    ptr3 := userzp+8
-    sector_to_update_systemd := userzp+10
-    current_bank_systemd := userzp+11
-    save_twil_register :=   userzp+12
-    save_twil_register_banking :=   userzp+13
-    bank_register :=    userzp+14
-    current_bank:= userzp+15
-    next_bank := userzp+16
-    ptr4 := userzp+18
+    fd_systemd                 := userzp
+    buffer                     := userzp+2
+    ; Don't use userzp+4 !!! It's a malloc for return routine in twilbank of shell command (when funct + T and funct +L are pressed)
+    ptr2                       := userzp+6
+    ptr3                       := userzp+8
+    sector_to_update_systemd   := userzp+10
+    current_bank_systemd       := userzp+11
+    save_twil_register         := userzp+12
+    save_twil_register_banking := userzp+13
+    bank_register              := userzp+14
+    current_bank               := userzp+15
+    next_bank                  := userzp+16
+    loader_tmp1                := userzp+16
+    ptr4                       := userzp+18
+    ptr1                       := userzp+20
 
 .macro  BRK_KERNEL   value
         .byte $00,value
@@ -38,8 +47,8 @@
 ; $c003
     jmp     _start_twilfirmware
 ; $c006
-    
-    jmp     _start_twilsoft
+
+    jmp     _loader
 
 _systemd:
 
@@ -63,10 +72,9 @@ _systemd:
 .include "commands/lsmod.asm"
 .include "commands/rmmod.asm"
 .include "commands/insmod.asm"
-.include "commands/twilconf/twilfirm.s"
-.include "commands/twilconf/twilsoft.s"
-.include "commands/twilconf/_start_twilmenubank.s"
-
+.include "commands/firmware/firmware.s"
+.include "commands/loader/loader.s"
+.include "commands/loader/_start_twilmenubank.s"
 .include "strings.asm"
 
 .proc read_banks
@@ -169,28 +177,30 @@ no_chars:
     rts
     
 @read:
-    sta     fd_systemd
+    sta     fd_systemd    ; Store fd
     stx     fd_systemd+1
 
     ;Malloc 512 for routine + buffer 16384
     malloc   16896,ptr2,str_oom ; Malloc for the routine to copy into memory, but also the 16KB of the bank to load
     lda      ptr2  ;
     sta      ptr4
-    sta      PTR_READ_DEST
+    ;sta      PTR_READ_DEST
     
     ldy      ptr2+1
 
     iny
     iny
-    sty      PTR_READ_DEST+1
+    ;sty      PTR_READ_DEST+1
     sty      ptr4+1  ; contains the content of the rom
 
+
+    fread ptr4, 16384, 1, fd_systemd
     ; We read the file with the correct
-    lda     #<16384
-    ldy     #>16384
+    ;lda     #<16384
+    ;ldy     #>16384
 
     ; reads byte 
-    BRK_KERNEL XFREAD
+    ;BRK_KERNEL XFREAD
 
     ; copy the routine
 

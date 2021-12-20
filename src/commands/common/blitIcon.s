@@ -59,31 +59,31 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+1) ; Infos Firmware 2 & 3
     .byte <($a000+POSY_ICON*40+7)    
     .byte <($a000+POSY_ICON*40+13)
-    .byte <($a000+POSY_ICON*40+1)
+    .byte <($a000+POSY_ICON*40+13) ; Game
     .byte <($a000+POSY_ICON*40+7)    
-    .byte <($a000+POSY_ICON*40+13)
+    .byte <($a000+POSY_ICON*40+19) ; Tools
     .byte <($a000+POSY_ICON*40+20)
-    .byte <($a000+POSY_ICON*40+7) ;  exit firm 2
+    .byte <($a000+POSY_ICON*40+7)  ; Exit firm 2
     .byte <($a000+POSY_ICON*40+7)  ; Network firm v3
-    .byte <($a000+POSY_ICON*40+25) ; Exit firm v3
-    .byte <($a000+POSY_ICON*40+19) ; clock (firm3)
+    .byte <($a000+POSY_ICON*40+19) ; Exit firm v3
+    .byte <($a000+POSY_ICON*40+13) ; clock (firm3)
     .byte <($a000+POSY_ICON*40+1)  ; Rom for launcher
-    .byte <($a000+POSY_ICON*40+7)  ; exit launcher
+    .byte <($a000+POSY_ICON*40+25) ; exit launcher
     
 icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+1)  ; 0 Infos
     .byte >($a000+POSY_ICON*40+7)  ; 1  
     .byte >($a000+POSY_ICON*40+13) ; 2
-    .byte >($a000+POSY_ICON*40+1)  ; 3
-    .byte >($a000+POSY_ICON*40+7)  ; 4  
-    .byte >($a000+POSY_ICON*40+13) ; 5
+    .byte >($a000+POSY_ICON*40+13) ; 3 Game
+    .byte >($a000+POSY_ICON*40+7)  ; 4 demo
+    .byte >($a000+POSY_ICON*40+19) ; 5 Tools
     .byte >($a000+POSY_ICON*40+20) ; 6
-    .byte >($a000+POSY_ICON*40+7) ; 7 Exit firm 2
+    .byte >($a000+POSY_ICON*40+7)  ; 7 Exit firm 2
     .byte >($a000+POSY_ICON*40+7)  ; 8 Network
-    .byte >($a000+POSY_ICON*40+25) ; 9 Exit firm v3
-    .byte >($a000+POSY_ICON*40+19) ; $0A   ; clock (firm3)
+    .byte >($a000+POSY_ICON*40+19) ; 9 Exit firm v3
+    .byte >($a000+POSY_ICON*40+13) ; $0A   ; clock (firm3)
     .byte >($a000+POSY_ICON*40+1)  ; $0B Rom for launcher
-    .byte >($a000+POSY_ICON*40+7)  ; $0C Exit launcher
+    .byte >($a000+POSY_ICON*40+25) ; $0C Exit loader
 
 icons_list_low:
     .byte <info_icon        ; 0
@@ -116,54 +116,54 @@ icons_list_high:
     .byte >exit_icon 
 
 reload_chip_icon:
-.byt $40,$5C,$40,$40,$40
-.byt $41,$7F,$40,$40,$40
-.byt $43,$63,$60,$40,$40
-.byt $43,$41,$60,$40,$40
-.byt $46,$40,$70,$58,$40
-.byt $46,$44,$71,$66,$40
-.byt $46,$46,$76,$41,$60
-.byt $43,$47,$70,$40,$58
-.byt $43,$67,$60,$41,$68
-.byt $41,$47,$70,$46,$48
-.byt $40,$47,$78,$58,$68
-.byt $41,$40,$41,$60,$78
-.byt $46,$40,$46,$49,$70
-.byt $47,$40,$58,$4E,$58
-.byt $47,$71,$62,$5C,$48
-.byt $47,$7E,$43,$66,$48
-.byt $47,$7C,$67,$42,$40
-.byt $41,$7C,$79,$62,$40
-.byt $40,$5D,$70,$60,$40
-.byt $40,$46,$58,$60,$40
-.byt $40,$40,$48,$40,$40
-.byt $40,$40,$48,$40,$40
-.byte $40,$40,$40,$40,$40
-.byte $40,$40,$40,$40,$40
+    .byt $40,$5C,$40,$40,$40
+    .byt $41,$7F,$40,$40,$40
+    .byt $43,$63,$60,$40,$40
+    .byt $43,$41,$60,$40,$40
+    .byt $46,$40,$70,$58,$40
+    .byt $46,$44,$71,$66,$40
+    .byt $46,$46,$76,$41,$60
+    .byt $43,$47,$70,$40,$58
+    .byt $43,$67,$60,$41,$68
+    .byt $41,$47,$70,$46,$48
+    .byt $40,$47,$78,$58,$68
+    .byt $41,$40,$41,$60,$78
+    .byt $46,$40,$46,$49,$70
+    .byt $47,$40,$58,$4E,$58
+    .byt $47,$71,$62,$5C,$48
+    .byt $47,$7E,$43,$66,$48
+    .byt $47,$7C,$67,$42,$40
+    .byt $41,$7C,$79,$62,$40
+    .byt $40,$5D,$70,$60,$40
+    .byt $40,$46,$58,$60,$40
+    .byt $40,$40,$48,$40,$40
+    .byt $40,$40,$48,$40,$40
+    .byt $40,$40,$40,$40,$40
+    .byt $40,$40,$40,$40,$40
 
 chip_in_icon:
-.byt $40,$5F,$40,$40,$40
-.byt $40,$51,$40,$40,$40
-.byt $40,$51,$40,$40,$40
-.byt $40,$51,$40,$40,$40
-.byt $41,$71,$73,$40,$40
-.byt $41,$40,$54,$70,$40
-.byt $40,$60,$60,$4C,$40
-.byt $40,$51,$40,$43,$40
-.byt $40,$4A,$40,$4D,$40
-.byt $40,$64,$40,$71,$40
-.byt $43,$40,$43,$45,$40
-.byt $4C,$40,$4C,$47,$40
-.byt $70,$40,$71,$4E,$40
-.byt $78,$43,$41,$73,$40
-.byt $7E,$4C,$53,$61,$40
-.byt $7F,$70,$5C,$71,$40
-.byt $7F,$64,$78,$50,$40
-.byt $4F,$67,$4C,$50,$40
-.byt $43,$6E,$44,$40,$40
-.byt $40,$73,$44,$40,$40
-.byt $40,$41,$40,$40,$40
-.byt $40,$41,$40,$40,$40
+    .byt $40,$5F,$40,$40,$40
+    .byt $40,$51,$40,$40,$40
+    .byt $40,$51,$40,$40,$40
+    .byt $40,$51,$40,$40,$40
+    .byt $41,$71,$73,$40,$40
+    .byt $41,$40,$54,$70,$40
+    .byt $40,$60,$60,$4C,$40
+    .byt $40,$51,$40,$43,$40
+    .byt $40,$4A,$40,$4D,$40
+    .byt $40,$64,$40,$71,$40
+    .byt $43,$40,$43,$45,$40
+    .byt $4C,$40,$4C,$47,$40
+    .byt $70,$40,$71,$4E,$40
+    .byt $78,$43,$41,$73,$40
+    .byt $7E,$4C,$53,$61,$40
+    .byt $7F,$70,$5C,$71,$40
+    .byt $7F,$64,$78,$50,$40
+    .byt $4F,$67,$4C,$50,$40
+    .byt $43,$6E,$44,$40,$40
+    .byt $40,$73,$44,$40,$40
+    .byt $40,$41,$40,$40,$40
+    .byt $40,$41,$40,$40,$40
 
 info_icon:
 .byte $41,$7f,$7f,$7f,$60
@@ -217,10 +217,6 @@ command_icon:
 .byte $60,$40,$43,$41,$40
 .byte $60,$40,$40,$41,$40
 .byte $7f,$7f,$7f,$7f,$40
-
-
-
-
 
 joy_icon:
 .byte $40,$40,$40,$40,$40

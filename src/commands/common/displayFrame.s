@@ -13,6 +13,9 @@ TWIL_INTERFACE_FIRST_LINE_TEXT:=$BB80+40*7
 TWIL_INTERFACE_LAST_LINE_TEXT:=$BB80+40*25
 TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
 
+.define FRAME_HORIZONTAL_BAR_CHAR 94
+.define FRAME_VERTICAL_BAR_CHAR   96
+
 .proc _displayFrame
     lda     #<POS_LEFT_UP_CORNER
     sta     userzp
@@ -31,7 +34,6 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
 @L11:
     lda     horizontal_bar,x
     sta     (userzp),y
-  ;  sta     (ptr2),y
     iny
     cpy     #39
     bne     @L11
@@ -75,18 +77,13 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
     lda     up_left,x
     sta     (userzp),y
    
-  ;  lda     down_left,x
-  ;  sta     (ptr2),y
-   
+ 
 
     ldy     #39
     lda     up_right,x
     sta     (userzp),y    
 
 
-
-   ; lda     down_right,x
-  ;  sta     (ptr2),y    
 
     lda     userzp
     clc
@@ -151,7 +148,7 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
     sta     __pos2+2
 
     ldy     #39
-    lda     #96 
+    lda     #FRAME_VERTICAL_BAR_CHAR
     ldx     #TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME
 L1:    
 __pos:    
@@ -184,7 +181,7 @@ __pos2:
     ldx     #$00
 @L200:    
     lda     horizontal_bar,x
-    sta     46080+8*94,x
+    sta     46080+8*FRAME_HORIZONTAL_BAR_CHAR,x
     lda     down_left,x
     sta     46080+8*'{',x
     lda     down_right,x
@@ -194,7 +191,7 @@ __pos2:
     bne     @L200
 
     ldx     #$00
-    lda     #94 ; ^
+    lda     #FRAME_HORIZONTAL_BAR_CHAR ; ^
 @L100:    
     sta     TWIL_INTERFACE_LAST_LINE_TEXT+1,x
     inx
