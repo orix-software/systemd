@@ -588,6 +588,11 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
 
 @go_up_routine:
+    ; Does the bar is at the first line ?
+
+
+
+@check_pos:
     lda     pos_y_listing
     beq     @skip_bar
     lda     #$10
@@ -618,7 +623,62 @@ index_software_ptr  := userzp+16 ;  ptr computre
     dec     id_current_software
 
 
-@skip_bar:    
+@skip_bar:
+    lda     pos_y_listing
+    bne     @exit_up   
+
+
+    lda     id_current_software+1
+    beq     @check_id_0_software
+    jmp     @doscroll
+
+@check_id_0_software:
+    lda     id_current_software
+    beq     @exit_up
+    
+    ;; No it's not the first software in the db, do scroll now
+@doscroll:
+    lda     #$10
+    jsr     loader_display_bar
+
+
+    jsr     doscrolldowninframe
+    lda     #LOADER_COLOR_BAR
+    jsr     loader_display_bar    
+
+
+    lda     id_current_software
+    bne     @skip_dec_high3
+    dec     id_current_software+1
+@skip_dec_high3:
+    dec     id_current_software
+
+   ; dec -2
+    lda     index_software_ptr
+    bne     @do_not_inc_ptr_high
+    dec     index_software_ptr+1
+@do_not_inc_ptr_high:    
+    dec     index_software_ptr
+
+    lda     index_software_ptr
+    bne     @do_not_inc_ptr_high2
+    dec     index_software_ptr+1
+@do_not_inc_ptr_high2:    
+    dec     index_software_ptr
+
+
+
+    jsr     loader_display_software
+    jmp     @exit_up
+
+
+@dec_id_current_software:
+    lda     id_current_software
+    bne     @skip_dec_high2
+    dec     id_current_software+1
+@skip_dec_high2:
+    dec     id_current_software
+@exit_up:
     jmp     @wait_keyboard
 
 .endproc
@@ -649,6 +709,14 @@ index_software_ptr  := userzp+16 ;  ptr computre
     ldx        #$01
     ldy        nb_of_software+1
     lda        nb_of_software
+    BRK_KERNEL XBINDX    
+
+
+    lda        #$20
+    sta        DEFAFF
+    lda        pos_y_listing
+    ldx        #$01
+    ldy        #$00
     BRK_KERNEL XBINDX    
 
 
@@ -768,28 +836,18 @@ index_software_ptr  := userzp+16 ;  ptr computre
     bne     @no_inc_current
     inc     id_current_software+1
 @no_inc_current:
-
-
     rts
 .endproc
 
 
-.proc loader_do_scroll_up
-    lda     reached_bottom_of_screen
-    cmp     #LOADER_LAST_LINE_MENU_ITEM
-  ;  beq     @skip_inc_reached_bottom_of_screen
-    rts
-.endproc
 
 .proc loader_display_bar
     pha
+  
     ldx     pos_bar
     stx     display+1
     ldx     pos_bar+1
     stx     display+2
-
-
-
 
     ldx     pos_y_listing
     beq     @out
@@ -813,6 +871,51 @@ display:
     rts
 .endproc
 
+.proc loader_display_software
+    sta     mode
+    ; Display next software
+
+    ldy     #$00
+    lda     (index_software_ptr),y
+    sta     @L33+1
+    sta     @get_char+1
+    iny
+    lda     (index_software_ptr),y
+    sta     @L33+2
+    sta     @get_char+2
+
+
+    ldy     #$00
+@L33:    
+    lda     $dead,y
+    beq     @out33
+    cmp     #';'
+    beq     @tape_file_found
+    iny
+    bne     @L33
+    
+    ldx     #$01
+@tape_file_found:
+    iny
+
+@get_char:    
+    lda     $dead,y
+    beq     @out33
+    cmp     #';'
+    beq     @out33
+    cpx     #LOADER_MAX_LENGTH_SOFTWARE_NAME
+    beq     @exit_diplay
+    sta     LOADER_FIRST_POSITION_BAR+1,x
+    inx
+
+    jmp     @tape_file_found
+@exit_diplay:
+@out33:
+    rts
+mode:
+    .res 1        
+.endproc
+
 .data
 tmp_Y:
     .res 1
@@ -820,26 +923,17 @@ pos_y_listing:
     .byte 0
 pos_bar:
     .byte 0,0
-
 nb_of_software:
-    .byte 0
-    .byte 0
-
+    .byte 0,0
 reached_bottom_of_screen:
     .byte 0
-
-; Position of the current icon (ROM excluded)
+;Position of the current icon (ROM excluded)
 software_menu_id:
-    .res 1
-
-
+    .byte 0
 fp_file_menu:
     .byte 0,0
-
 pos_menu_loader_x:
     .byte 0
-
-
 files_type_loader_low:
     .byte <file_demo_db
     .byte <file_games_db

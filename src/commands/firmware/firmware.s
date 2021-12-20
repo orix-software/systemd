@@ -333,6 +333,8 @@ str_usb:
 .include "../common/displayFrame.s"
 .include "../common/blitIcon.s"
 .include "../common/doscrollupinframe.s"
+.include "../common/doscrolldowninframe.s"
+
 
 
 str_would_you_like_to_exit:
