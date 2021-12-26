@@ -29,10 +29,11 @@
     save_twil_register_banking := userzp+13
     bank_register              := userzp+14
     current_bank               := userzp+15
-    next_bank                  := userzp+16
-    loader_tmp1                := userzp+16
+    
     ptr4                       := userzp+18
     ptr1                       := userzp+20
+    next_bank                  := userzp+22
+    loader_tmp1                := userzp+22
 
 .macro  BRK_KERNEL   value
         .byte $00,value
