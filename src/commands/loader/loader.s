@@ -8,6 +8,7 @@
 .define LOADER_MAX_SOFTWARE_BY_CATEGORY 2000
 .define LOADER_LAST_LINE                $bb80+24*40+1
 .define LOADER_MAX_LENGTH_SOFTWARE_NAME 30
+.define LOADER_POS_INF_NUMBER           $bb80+27*40
 
 ; Number of malloc here :
 ; Routine loaded to load systemd.rom
@@ -51,6 +52,10 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
     ldx     #TWIL_ICON_EXIT_LOADER
     jsr     _blitIcon
+
+    ldx     #TWIL_ICON_MUSIC_LOADER
+    jsr     _blitIcon
+
 
 @start_menu_bank:
     jsr     twil_interface_clear_menu
@@ -139,7 +144,7 @@ index_software_ptr  := userzp+16 ;  ptr computre
     jsr     twil_interface_clear_menu
     jsr     @display_menu_loader_software
     cmp     #TWIL_KEYBOARD_RIGHT
-    beq     @exit_menu 
+    beq     @music_menu
     cmp     #TWIL_KEYBOARD_LEFT
     bne     @check_esc_tools_menu 
 
@@ -155,15 +160,53 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
     
     jmp     @game_menu
+
+
+
+
+@music_menu:
+    lda     #$03
+    sta     software_menu_id
+    lda     #$05
+    sta     twil_interface_current_menu
+    lda     #$01
+    jsr     twil_interface_change_menu
+
+
+
+    jsr     twil_interface_clear_menu
+    jsr     @display_menu_loader_software
+    cmp     #TWIL_KEYBOARD_RIGHT
+    beq     @exit_menu 
+    cmp     #TWIL_KEYBOARD_LEFT
+    bne     @check_esc_tools_menu 
+
+    lda     #$00
+    jsr     twil_interface_change_menu
+
+    ;lda     #$05
+    ;sta     twil_interface_current_menu    
+    ;lda     #$01
+    ;sta     software_menu_id
+    
+
+
+    
+    jmp     @tools_menu
     
 @check_esc_tools_menu:   
 
     rts        
 @exit_menu:
     jsr     twil_interface_clear_menu
-    lda     #$05
-    sta     twil_interface_current_menu    
+    lda     #TWIL_ICON_MUSIC_LOADER
+    sta     twil_interface_current_menu
+
     lda     #$01
+    jsr     twil_interface_change_menu
+    lda     #TWIL_ICON_EXIT_LOADER
+    sta     twil_interface_current_menu    
+    lda     #$00
     jsr     twil_interface_change_menu
 
     
@@ -186,7 +229,7 @@ index_software_ptr  := userzp+16 ;  ptr computre
     lda     #$01
     jsr     twil_interface_change_menu
 
-    jmp     @tools_menu
+    jmp     @music_menu
 
 @jmp_exit_interface_confirmed:
     jmp 	exit_interface_confirmed
@@ -505,7 +548,7 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
 
 @wait_keyboard:
-    ;jsr     debug_loader   
+    jsr     debug_loader   
     
     BRK_KERNEL XRDW0
     cmp     #TWIL_KEYBOARD_LEFT
@@ -705,9 +748,10 @@ index_software_ptr  := userzp+16 ;  ptr computre
 .endproc
 
 .proc debug_loader
-    lda        #<($bb80+27*40)
+
+    lda        #<(LOADER_POS_INF_NUMBER)
     sta        TR5
-    lda        #>($bb80+27*40)
+    lda        #>(LOADER_POS_INF_NUMBER)
     sta        TR5+1
 
     lda        #$20
@@ -715,13 +759,22 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
     ldx        #$01
     ldy        id_current_software+1
+    
     lda        id_current_software
+    clc
+    adc        #$01
+    bcc        @S1
+    iny
+@S1:    
     BRK_KERNEL XBINDX
 
+    lda        #'/'
+    sta        LOADER_POS_INF_NUMBER+3
 
-    lda        #<($bb80+27*40+6)
+
+    lda        #<(LOADER_POS_INF_NUMBER+4)
     sta        TR5
-    lda        #>($bb80+27*40+6)
+    lda        #>(LOADER_POS_INF_NUMBER+4)
     sta        TR5+1
 
     lda        #$20
@@ -733,29 +786,29 @@ index_software_ptr  := userzp+16 ;  ptr computre
     BRK_KERNEL XBINDX    
 
 
-    lda        #$20
-    sta        DEFAFF
-    lda        pos_y_listing
-    ldx        #$01
-    ldy        #$00
-    BRK_KERNEL XBINDX    
+    ;lda        #$20
+    ;sta        DEFAFF
+    ;lda        pos_y_listing
+    ;ldx        #$01
+    ;ldy        #$00
+    ;BRK_KERNEL XBINDX    
 
 
-    ldy        #$00
-    lda        (index_software_ptr),y
-    sta        @L200+1
-    iny
-    lda        (index_software_ptr),y
-    sta        @L200+2
+    ;ldy        #$00
+    ;lda        (index_software_ptr),y
+    ;sta        @L200+1
+    ;iny
+    ;lda        (index_software_ptr),y
+    ;sta        @L200+2
 
-    ldy        #$00
-@L200:    
-    lda        $dead,y
+;    ldy        #$00
+;@L200:    
+    ;lda        $dead,y
   ;  sta        $bb80+23*40,y
-    beq        @out200
-    iny
-    bne        @L200
-@out200:
+    ;beq        @out200
+    ;iny
+    ;bne        @L200
+;@out200:
 
 
 
@@ -959,18 +1012,18 @@ files_type_loader_low:
     .byte <file_demo_db
     .byte <file_games_db
     .byte <file_tools_db
-    .byte <file_unsorted_db
     .byte <file_music_db
+    .byte <file_unsorted_db
 
 files_type_loader_high:
     .byte >file_demo_db
     .byte >file_games_db
     .byte >file_tools_db
-    .byte >file_unsorted_db
     .byte >file_music_db
+    .byte >file_unsorted_db    
 
 file_path:
-    .asciiz "/var/cache/launcher/"
+    .asciiz "/var/cache/loader/"
 
 file_demo_db:
     .asciiz "demos.db"

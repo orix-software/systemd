@@ -68,14 +68,12 @@ _systemd:
     rts
 .endproc
 
-.include "commands/modinfo.asm"
-.include "commands/lsmod.asm"
-.include "commands/rmmod.asm"
-.include "commands/insmod.asm"
+
 .include "commands/firmware/firmware.s"
 .include "commands/loader/loader.s"
 .include "commands/loader/_start_twilmenubank.s"
 .include "strings.asm"
+
 
 .proc read_banks
 
@@ -540,44 +538,12 @@ bank:
 
 .endproc
 
-
-
-
-.asciiz "/lib8/modules/2.4.17"
-
 command0_str:
         .ASCIIZ "systemd"
 command1_str:
        .ASCIIZ "twilconf"
-
-;command1_str:
- ;       .ASCIIZ "lsmod"
-;command2_str:        
-;        .ASCIIZ "modprob"
-command3_str:
-        .ASCIIZ "insmod"
-command4_str:        
-        .ASCIIZ "rmmod"
-
-command5_str:        
-        .ASCIIZ "modinfo"
-
 commands_text:
-        ;.addr command0_str
-        .addr command1_str
- ;       .addr command2_str        
-        .addr command3_str        
-        .addr command4_str
-        .addr command5_str
-
 commands_address:
-        ;.addr _systemd
-   ;     .addr _twilconf
-        ;.addr _lsmod
-       ; .addr _modprobe
-        .addr _insmod
-        .addr _rmmod
-        .addr _modinfo
 commands_version:
         .ASCIIZ "0.0.1"
 

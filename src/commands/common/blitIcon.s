@@ -2,8 +2,11 @@
 
 
 
+
 ptr_pos_img_src := userzp ; 2
 ptr_pos_img_dest := userzp+2 ; 2
+
+.define ICON_SIZE_X $05
 
 .proc _blitIcon
 
@@ -26,12 +29,12 @@ ptr_pos_img_dest := userzp+2 ; 2
     lda     (ptr_pos_img_src),y
     sta     (ptr_pos_img_dest),y
     iny
-    cpy     #$05
+    cpy     #ICON_SIZE_X
     bne     @L1
 
     lda     ptr_pos_img_src
     clc 
-    adc     #$05
+    adc     #ICON_SIZE_X
     bcc     @no_inc
     inc     ptr_pos_img_src+1
 @no_inc:
@@ -67,8 +70,10 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+7)  ; Network firm v3
     .byte <($a000+POSY_ICON*40+19) ; Exit firm v3
     .byte <($a000+POSY_ICON*40+13) ; clock (firm3)
-    .byte <($a000+POSY_ICON*40+1)  ; Rom for launcher
-    .byte <($a000+POSY_ICON*40+25) ; exit launcher
+    .byte <($a000+POSY_ICON*40+1)  ; Rom for loader
+    .byte <($a000+POSY_ICON*40+34) ; exit loader
+    .byte <($a000+POSY_ICON*40+19) ; Engrenage to fix
+    .byte <($a000+POSY_ICON*40+25) ; Music
     
 icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+1)  ; 0 Infos
@@ -83,7 +88,9 @@ icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+19) ; 9 Exit firm v3
     .byte >($a000+POSY_ICON*40+13) ; $0A   ; clock (firm3)
     .byte >($a000+POSY_ICON*40+1)  ; $0B Rom for launcher
-    .byte >($a000+POSY_ICON*40+25) ; $0C Exit loader
+    .byte >($a000+POSY_ICON*40+34) ; $0C Exit loader
+    .byte >($a000+POSY_ICON*40+19) ; Engrenage to fix
+    .byte >($a000+POSY_ICON*40+25) ; Music
 
 icons_list_low:
     .byte <info_icon        ; 0
@@ -99,6 +106,8 @@ icons_list_low:
     .byte <clock_icon       ; $0A
     .byte <chip_icon        ; $0B    
     .byte <exit_icon        ; $0C
+    .byte <engrenage_icon   ; $0D
+    .byte <music_icon       ; $0E
     
 icons_list_high:    
     .byte >info_icon
@@ -114,6 +123,8 @@ icons_list_high:
     .byte >clock_icon 
     .byte >chip_icon            
     .byte >exit_icon 
+    .byte >engrenage_icon 
+    .byte >music_icon
 
 reload_chip_icon:
     .byt $40,$5C,$40,$40,$40
@@ -404,4 +415,23 @@ network_icon:
 .byt $50,$64,$49,$42,$40
 .byt $4F,$43,$70,$7C,$40
 .byt $55,$65,$59,$56,$40
-.byt $5F,$67,$79,$7E,$40
+    .byt $5F,$67,$79,$7E,$40
+
+music_icon:
+        .byt $40,$40,$40,$40,$40,$40,$40,$40,$40,$58,$40,$40,$40,$43,$78,$40
+        .byt $40,$40,$5f,$78,$40,$40,$43,$7c,$58,$40,$41,$7f,$60,$58,$40,$41
+        .byt $7c,$43,$78,$40,$41,$60,$5f,$78,$40,$41,$67,$7e,$58,$40,$41,$7f
+        .byt $60,$58,$40,$41,$78,$40,$58,$40,$41,$60,$40,$58,$40,$41,$60,$40
+        .byt $58,$40,$41,$60,$40,$58,$40,$41,$60,$40,$58,$40,$41,$60,$43,$58
+        .byt $40,$4d,$60,$47,$78,$40,$5f,$60,$4f,$78,$40,$7f,$60,$4f,$70,$40
+        .byt $7f,$40,$47,$60,$40,$5e,$40,$43,$40,$40,$4c,$40,$40,$40,$40,$40
+        .byt $40,$40,$40,$40,$40,$40,$40,$40
+
+engrenage_icon:
+    .byt $40,$40,$40,$40,$40,$43,$70,$40,$40,$43,$70,$40,$41,$43,$70,$60
+    .byt $43,$67,$79,$70,$47,$7f,$7f,$78,$43,$7f,$7f,$70,$41,$7f,$7f,$60
+    .byt $41,$7f,$7f,$60,$43,$7c,$4f,$70,$5f,$78,$47,$7e,$5f,$78,$47,$7e
+    .byt $5f,$78,$47,$7e,$5f,$78,$47,$7e,$43,$7c,$4f,$70,$41,$7f,$7f,$60
+    .byt $41,$7f,$7f,$60,$43,$7f,$7f,$70,$47,$7f,$7f,$78,$43,$67,$79,$70
+    .byt $41,$43,$70,$60,$40,$43,$70,$40,$40,$43,$70,$40,$40,$40,$40,$40
+        

@@ -1,5 +1,17 @@
 .include "../dependencies/ds1501-lib/src/include/ds1501.s"
 
+.define TWIL_ICON_GAME               $03 
+.define TWIL_ICON_DEMO               $04
+.define TWIL_ICON_TOOLS              $05
+.define TWIL_ICON_MUSIC              $06
+
+.define TWIL_ICON_CLOCK_ID           $0A
+.define TWIL_ICON_ROM_ID             $0B
+.define TWIL_ICON_EXIT_LOADER        $0C
+.define TWIL_ICON_ENGRENAGE_FIRMWARE $0D
+.define TWIL_ICON_MUSIC_LOADER       $0E
+
+
 .define TWIL_INC_LOADED  twil_inc_loaded
 
 .define TWIL_MASK_REGISTER_VERSION 7
@@ -8,12 +20,7 @@
 
 .define TWIL_INFO_ICON_ID         0
 .define TWIL_INFO_MEMORY_ID       $01
-.define TWIL_ICON_GAME            $03 
-.define TWIL_ICON_DEMO            $04
-.define TWIL_ICON_TOOLS           $05
-.define TWIL_ICON_CLOCK_ID        $0A
-.define TWIL_ICON_ROM_ID          $0B
-.define TWIL_ICON_EXIT_LOADER     $0C
+
 
 .define TWIL_SWITCH_OFF_ICON      $00
 .define TWIL_SWITCH_ON_ICON       $01
