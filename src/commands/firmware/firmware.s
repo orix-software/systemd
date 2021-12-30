@@ -74,8 +74,8 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
 
     lda     $342 ; Get version
     and     #TWIL_MASK_REGISTER_VERSION
-    cmp     #$03
-    beq     @version3
+    cmp     #$04
+    beq     @version4
     ; Firm 2
     lda     #TWILFIRM_MAX_MENU_ENTRY_FIRM_2
     sta     twil_max_menu_icon_firmware
@@ -83,7 +83,7 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     ldx     #$07
     jsr     _blitIcon
     jmp     @run_menu
-@version3:
+@version4:
     lda     #TWILFIRM_MAX_MENU_ENTRY_FIRM_3
     sta     twil_max_menu_icon_firmware
 
@@ -173,8 +173,8 @@ go_left_twilfirm:
 
     lda     $342 ; Get version
     and     #%00000011
-    cmp     #$03
-    beq     @version3
+    cmp     #$04
+    beq     @version4
 
     lda     twil_interface_current_menu         ; Get current menu 
     beq     @display_menu_infos
@@ -192,7 +192,7 @@ go_left_twilfirm:
 
 @upgrade_menu:
     rts    
-@version3:    
+@version4:    
     lda     twil_interface_current_menu         ; Get current menu 
     beq     @display_menu_infos
     cmp     #TWIL_ACTION_MEMORY_MENU

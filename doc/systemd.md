@@ -21,8 +21,6 @@ It displays informations as :
 * Usb firmware version : The firmware of the usb controler
 * Microdisc register : if it's present, some extra software can works : ripped, Osid music etc, and cumulus can be plugged Floppy disk can be started
 
-On the other icon rom, it displays the banks loaded into the board
-
 ## Twilighte loader
 
 Uses funct + T to launch the menu
@@ -37,7 +35,6 @@ You can select the rom you want to start :
 and others Roms
 
 Loader can starts tape file as atmos .tap file by category (demo, games).
-
 
 ## Issues
 
