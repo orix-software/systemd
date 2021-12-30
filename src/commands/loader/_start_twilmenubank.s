@@ -128,8 +128,8 @@ BANK_LABEL=($BB80+40*7+2)
     jsr     _missing_file
     print   str_failed_word,NOSAVE
     BRK_KERNEL XCRLF 
-    print   str_error_path_not_found
-    print   (ptr1)
+    print   str_error_path_not_found,NOSAVE
+    print   (ptr1),NOSAVE
     BRK_KERNEL XCRLF
     rts
     
@@ -318,7 +318,7 @@ no_path:
 no_chars:
    ; print str_done,NOSAVE
     dec     number_of_roms_in_banks_cnf
-        lda     #$01 ; error
+    lda     #$01 ; error
     rts
 .endproc
 
@@ -361,8 +361,7 @@ MAX_LINE_SIZE_INI=100
     lda      saveA
     sta      (ptr4),y
     ldy      saveY
-  ;  BRK_KERNEL XWR0
-   ; sta     BANK_LABEL,x
+
     inx
     iny
     cpy      #MAX_LINE_SIZE_INI
@@ -388,7 +387,6 @@ MAX_LINE_SIZE_INI=100
     inc      number_of_roms_in_banks_cnf
 
     lda      #$00
-    ;sta      current_section
     rts
 
     ldy      #$00

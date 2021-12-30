@@ -7,7 +7,7 @@
 .define LOADER_LAST_LINE_MENU_ITEM      18
 .define LOADER_MAX_SOFTWARE_BY_CATEGORY 2000
 .define LOADER_LAST_LINE                $bb80+24*40+1
-.define LOADER_MAX_LENGTH_SOFTWARE_NAME 30
+.define LOADER_MAX_LENGTH_SOFTWARE_NAME 35
 .define LOADER_POS_INF_NUMBER           $bb80+27*40
 
 ; Number of malloc here :
@@ -24,7 +24,7 @@ ptr2_loader         := userzp+8
 ptr3_loader         := userzp+10
 index_software      := userzp+12 ; Table which contains the ptr of each software
 id_current_software := userzp+14 ; Word
-index_software_ptr  := userzp+16 ;  ptr computre
+index_software_ptr  := userzp+16 ; ptr computre
 
 
 
@@ -151,13 +151,6 @@ index_software_ptr  := userzp+16 ;  ptr computre
     lda     #$00
     jsr     twil_interface_change_menu
 
-    ;lda     #$05
-    ;sta     twil_interface_current_menu    
-    ;lda     #$01
-    ;sta     software_menu_id
-    
-
-
     
     jmp     @game_menu
 
@@ -183,14 +176,6 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
     lda     #$00
     jsr     twil_interface_change_menu
-
-    ;lda     #$05
-    ;sta     twil_interface_current_menu    
-    ;lda     #$01
-    ;sta     software_menu_id
-    
-
-
     
     jmp     @tools_menu
     
@@ -262,7 +247,7 @@ index_software_ptr  := userzp+16 ;  ptr computre
     bne     @not_oom
     ; FIX OOM
     jsr     exit_interface_confirmed
-    print   str_oom
+    print   str_oom,NOSAVE
     rts
 
 @not_oom:
@@ -564,8 +549,6 @@ index_software_ptr  := userzp+16 ;  ptr computre
     jmp     @wait_keyboard
 
 @exit_listing:
-   ; mfree   (ptr2)
-  ;  mfree   (index_software)
     rts    
 @go_enter:
     jmp     _loader_launch_software
@@ -749,68 +732,41 @@ index_software_ptr  := userzp+16 ;  ptr computre
 
 .proc debug_loader
 
-    lda        #<(LOADER_POS_INF_NUMBER)
-    sta        TR5
-    lda        #>(LOADER_POS_INF_NUMBER)
-    sta        TR5+1
+    lda     #<(LOADER_POS_INF_NUMBER)
+    sta     TR5
+    lda     #>(LOADER_POS_INF_NUMBER)
+    sta     TR5+1
 
-    lda        #$20
-    sta        DEFAFF
+    lda     #$20
+    sta     DEFAFF
 
-    ldx        #$01
-    ldy        id_current_software+1
+    ldx     #$01
+    ldy     id_current_software+1
     
-    lda        id_current_software
+    lda     id_current_software
     clc
-    adc        #$01
-    bcc        @S1
+    adc     #$01
+    bcc     @S1
     iny
 @S1:    
     BRK_KERNEL XBINDX
 
-    lda        #'/'
-    sta        LOADER_POS_INF_NUMBER+3
+    lda     #'/'
+    sta     LOADER_POS_INF_NUMBER+3
 
 
-    lda        #<(LOADER_POS_INF_NUMBER+4)
-    sta        TR5
-    lda        #>(LOADER_POS_INF_NUMBER+4)
-    sta        TR5+1
+    lda     #<(LOADER_POS_INF_NUMBER+4)
+    sta     TR5
+    lda     #>(LOADER_POS_INF_NUMBER+4)
+    sta     TR5+1
 
-    lda        #$20
-    sta        DEFAFF
+    lda     #$20
+    sta     DEFAFF
 
-    ldx        #$01
-    ldy        nb_of_software+1
-    lda        nb_of_software
+    ldx     #$01
+    ldy     nb_of_software+1
+    lda     nb_of_software
     BRK_KERNEL XBINDX    
-
-
-    ;lda        #$20
-    ;sta        DEFAFF
-    ;lda        pos_y_listing
-    ;ldx        #$01
-    ;ldy        #$00
-    ;BRK_KERNEL XBINDX    
-
-
-    ;ldy        #$00
-    ;lda        (index_software_ptr),y
-    ;sta        @L200+1
-    ;iny
-    ;lda        (index_software_ptr),y
-    ;sta        @L200+2
-
-;    ldy        #$00
-;@L200:    
-    ;lda        $dead,y
-  ;  sta        $bb80+23*40,y
-    ;beq        @out200
-    ;iny
-    ;bne        @L200
-;@out200:
-
-
 
     rts
 .endproc

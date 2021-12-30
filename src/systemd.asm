@@ -168,8 +168,8 @@ no_chars:
 
     print   str_failed_word,NOSAVE
     BRK_KERNEL XCRLF 
-    print   str_error_path_not_found
-    print   (buffer)
+    print   str_error_path_not_found,NOSAVE
+    print   (buffer),NOSAVE
     BRK_KERNEL XCRLF
   ;  mfree (ptr1)     
     
@@ -183,23 +183,16 @@ no_chars:
     malloc   16896,ptr2,str_oom ; Malloc for the routine to copy into memory, but also the 16KB of the bank to load
     lda      ptr2  ;
     sta      ptr4
-    ;sta      PTR_READ_DEST
     
     ldy      ptr2+1
 
     iny
     iny
-    ;sty      PTR_READ_DEST+1
+
     sty      ptr4+1  ; contains the content of the rom
 
 
     fread ptr4, 16384, 1, fd_systemd
-    ; We read the file with the correct
-    ;lda     #<16384
-    ;ldy     #>16384
-
-    ; reads byte 
-    ;BRK_KERNEL XFREAD
 
     ; copy the routine
 
