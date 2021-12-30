@@ -1,29 +1,39 @@
-.include   "../dependencies/orix-sdk/macros/SDK.mac"
+;.include   "../dependencies/orix-sdk/macros/SDK.mac"
+.include   "../dependencies/orix-sdk/macros/strnxxx.mac"
+.include   "../dependencies/orix-sdk/macros/SDK_print.mac"
+.include   "../dependencies/orix-sdk/macros/SDK_memory.mac"
+.include   "../dependencies/orix-sdk/macros/SDK_file.mac"
+
 .include   "../libs/usr/arch/include/twil.inc"
 
 .include   "telestrat.inc"
 .include   "fcntl.inc"
 .include   "cpu.mac"
+.include   "errno.inc"
 
 .define TWIL_INTERFACE_NUMBER_OF_RAM_BANK       32
 .define TWIL_INTERFACE_NUMBER_OF_CHARS_IN_LABEL 8
 
     userzp := $80
 
+    
 
-    fd_systemd := userzp
-    buffer := userzp+2
-    ptr1 := userzp+4
-    ptr2 := userzp+6
-    ptr3 := userzp+8
-    sector_to_update_systemd := userzp+10
-    current_bank_systemd := userzp+11
-    save_twil_register :=   userzp+12
-    save_twil_register_banking :=   userzp+13
-    bank_register :=    userzp+14
-    current_bank:= userzp+15
-    next_bank := userzp+16
-    ptr4 := userzp+18
+    fd_systemd                 := userzp
+    buffer                     := userzp+2
+    ; Don't use userzp+4 !!! It's a malloc for return routine in twilbank of shell command (when funct + T and funct +L are pressed)
+    ptr2                       := userzp+6
+    ptr3                       := userzp+8
+    sector_to_update_systemd   := userzp+10
+    current_bank_systemd       := userzp+11
+    save_twil_register         := userzp+12
+    save_twil_register_banking := userzp+13
+    bank_register              := userzp+14
+    current_bank               := userzp+15
+    
+    ptr4                       := userzp+18
+    ptr1                       := userzp+20
+    next_bank                  := userzp+22
+    loader_tmp1                := userzp+22
 
 .macro  BRK_KERNEL   value
         .byte $00,value
@@ -38,8 +48,8 @@
 ; $c003
     jmp     _start_twilfirmware
 ; $c006
-    
-    jmp     _start_twilsoft
+
+    jmp     _loader
 
 _systemd:
 
@@ -59,15 +69,12 @@ _systemd:
     rts
 .endproc
 
-.include "commands/modinfo.asm"
-.include "commands/lsmod.asm"
-.include "commands/rmmod.asm"
-.include "commands/insmod.asm"
-.include "commands/twilconf/twilfirm.s"
-.include "commands/twilconf/twilsoft.s"
-.include "commands/twilconf/_start_twilmenubank.s"
 
+.include "commands/firmware/firmware.s"
+.include "commands/loader/loader.s"
+.include "commands/loader/_start_twilmenubank.s"
 .include "strings.asm"
+
 
 .proc read_banks
 
@@ -161,36 +168,31 @@ no_chars:
 
     print   str_failed_word,NOSAVE
     BRK_KERNEL XCRLF 
-    print   str_error_path_not_found
-    print   (buffer)
+    print   str_error_path_not_found,NOSAVE
+    print   (buffer),NOSAVE
     BRK_KERNEL XCRLF
   ;  mfree (ptr1)     
     
     rts
     
 @read:
-    sta     fd_systemd
+    sta     fd_systemd    ; Store fd
     stx     fd_systemd+1
 
     ;Malloc 512 for routine + buffer 16384
     malloc   16896,ptr2,str_oom ; Malloc for the routine to copy into memory, but also the 16KB of the bank to load
     lda      ptr2  ;
     sta      ptr4
-    sta      PTR_READ_DEST
     
     ldy      ptr2+1
 
     iny
     iny
-    sty      PTR_READ_DEST+1
+
     sty      ptr4+1  ; contains the content of the rom
 
-    ; We read the file with the correct
-    lda     #<16384
-    ldy     #>16384
 
-    ; reads byte 
-    BRK_KERNEL XFREAD
+    fread ptr4, 16384, 1, fd_systemd
 
     ; copy the routine
 
@@ -530,44 +532,12 @@ bank:
 
 .endproc
 
-
-
-
-.asciiz "/lib8/modules/2.4.17"
-
 command0_str:
         .ASCIIZ "systemd"
 command1_str:
        .ASCIIZ "twilconf"
-
-;command1_str:
- ;       .ASCIIZ "lsmod"
-;command2_str:        
-;        .ASCIIZ "modprob"
-command3_str:
-        .ASCIIZ "insmod"
-command4_str:        
-        .ASCIIZ "rmmod"
-
-command5_str:        
-        .ASCIIZ "modinfo"
-
 commands_text:
-        ;.addr command0_str
-        .addr command1_str
- ;       .addr command2_str        
-        .addr command3_str        
-        .addr command4_str
-        .addr command5_str
-
 commands_address:
-        ;.addr _systemd
-   ;     .addr _twilconf
-        ;.addr _lsmod
-       ; .addr _modprobe
-        .addr _insmod
-        .addr _rmmod
-        .addr _modinfo
 commands_version:
         .ASCIIZ "0.0.1"
 

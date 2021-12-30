@@ -25,21 +25,22 @@ It displays informations as :
 
 Uses funct + T to launch the menu
 
-![alt text](loader.jpg "firmware")
+![alt text](loader2.jpg "firmware")
 
-You can select the rom you want to start : 
+You can select the rom you want to start :
 * For atmos (usbdrive or sdcard), root path of the rom is /home/basic11 
 * For Oric-1 (usbdrive or sdcard), root path of the rom is /home/basic10
 * For Pravetzt (usbdrive or sdcard), root path of the rom is /home/pravetzt
+
+and others Roms
+
+Loader can starts tape file as atmos .tap file by category (demo, games).
 
 ## Issues
 
 It's a usable beta version, a lot of roms works, but here are issues :
 
-* Original rom (hardware tape) oric-1 and atmos does not work yet (work in progress)
-* Dflat roms works but keyboard is not working (work in progress)
-* Exit from twilighte firmware produces error when it returns to shell, the work around is to press reset
-* Exit from twilighte loader produces error when it returns to shell, the work around is to press reset (Kernel bug)
+* Dflat roms works but keyboard is not working on some oric (work in progress)
 
 ## Credits
 

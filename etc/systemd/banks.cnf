@@ -1,14 +1,24 @@
-[Atmos(usbdrive)]
+[Atmos (usbdrive)]
 path=/usr/share/basic11/basicus1.rom
-[Atmos(sdcard)]
+[Atmos (sdcard)]
 path=/usr/share/basic11/basicsd1.rom
-[Oric-1(usbdrive)]
+[Atmos (Hardware Tape)]
+path=/usr/share/basic11/basic11b.rom
+[Oric-1 (usbdrive)]
 path=/usr/share/basic10/basicus2.rom
-[Oric-1(sdcard)]
+[Oric-1 (sdcard)]
 path=/usr/share/basic10/basicsd2.rom
-[Pravetz(usbdrive)]
+[Oric-1 (Hardware Tape)]
+path=/usr/share/basic10/basic10.rom
+[Pravetz (usbdrive)]
 path=/usr/share/pravetzt/pravus1.rom
-[Pravetz(sdcard)]
+[Pravetz (sdcard)]
 path=/usr/share/pravetzt/pravsd1.rom
-[Dflat 0.13(Real hardtape)]
-path=/usr/share/systemd/roms/dflat013.rom
+[Dflat test]
+path=/usr/share/systemd/roms/dflat10.rom
+[Dflat test]
+path=/usr/share/systemd/roms/dflattes.rom
+[Atmos FR 2drive)]
+path=/usr/share/systemd/roms/bas11fr2.rom
+[Atmos FR 2drive)]
+path=/usr/share/systemd/roms/bas11fr2.rom

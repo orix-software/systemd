@@ -2,8 +2,11 @@
 
 
 
+
 ptr_pos_img_src := userzp ; 2
 ptr_pos_img_dest := userzp+2 ; 2
+
+.define ICON_SIZE_X $05
 
 .proc _blitIcon
 
@@ -26,12 +29,12 @@ ptr_pos_img_dest := userzp+2 ; 2
     lda     (ptr_pos_img_src),y
     sta     (ptr_pos_img_dest),y
     iny
-    cpy     #$05
+    cpy     #ICON_SIZE_X
     bne     @L1
 
     lda     ptr_pos_img_src
     clc 
-    adc     #$05
+    adc     #ICON_SIZE_X
     bcc     @no_inc
     inc     ptr_pos_img_src+1
 @no_inc:
@@ -59,31 +62,35 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+1) ; Infos Firmware 2 & 3
     .byte <($a000+POSY_ICON*40+7)    
     .byte <($a000+POSY_ICON*40+13)
-    .byte <($a000+POSY_ICON*40+1)
+    .byte <($a000+POSY_ICON*40+13) ; Game
     .byte <($a000+POSY_ICON*40+7)    
-    .byte <($a000+POSY_ICON*40+13)
+    .byte <($a000+POSY_ICON*40+19) ; Tools
     .byte <($a000+POSY_ICON*40+20)
-    .byte <($a000+POSY_ICON*40+7) ;  exit firm 2
+    .byte <($a000+POSY_ICON*40+7)  ; Exit firm 2
     .byte <($a000+POSY_ICON*40+7)  ; Network firm v3
-    .byte <($a000+POSY_ICON*40+25) ; Exit firm v3
-    .byte <($a000+POSY_ICON*40+19) ; clock (firm3)
-    .byte <($a000+POSY_ICON*40+1)  ; Rom for launcher
-    .byte <($a000+POSY_ICON*40+7)  ; exit launcher
+    .byte <($a000+POSY_ICON*40+19) ; Exit firm v3
+    .byte <($a000+POSY_ICON*40+13) ; clock (firm3)
+    .byte <($a000+POSY_ICON*40+1)  ; Rom for loader
+    .byte <($a000+POSY_ICON*40+34) ; exit loader
+    .byte <($a000+POSY_ICON*40+19) ; Engrenage to fix
+    .byte <($a000+POSY_ICON*40+25) ; Music
     
 icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+1)  ; 0 Infos
     .byte >($a000+POSY_ICON*40+7)  ; 1  
     .byte >($a000+POSY_ICON*40+13) ; 2
-    .byte >($a000+POSY_ICON*40+1)  ; 3
-    .byte >($a000+POSY_ICON*40+7)  ; 4  
-    .byte >($a000+POSY_ICON*40+13) ; 5
+    .byte >($a000+POSY_ICON*40+13) ; 3 Game
+    .byte >($a000+POSY_ICON*40+7)  ; 4 demo
+    .byte >($a000+POSY_ICON*40+19) ; 5 Tools
     .byte >($a000+POSY_ICON*40+20) ; 6
-    .byte >($a000+POSY_ICON*40+7) ; 7 Exit firm 2
+    .byte >($a000+POSY_ICON*40+7)  ; 7 Exit firm 2
     .byte >($a000+POSY_ICON*40+7)  ; 8 Network
-    .byte >($a000+POSY_ICON*40+25) ; 9 Exit firm v3
-    .byte >($a000+POSY_ICON*40+19) ; $0A   ; clock (firm3)
+    .byte >($a000+POSY_ICON*40+19) ; 9 Exit firm v3
+    .byte >($a000+POSY_ICON*40+13) ; $0A   ; clock (firm3)
     .byte >($a000+POSY_ICON*40+1)  ; $0B Rom for launcher
-    .byte >($a000+POSY_ICON*40+7)  ; $0C Exit launcher
+    .byte >($a000+POSY_ICON*40+34) ; $0C Exit loader
+    .byte >($a000+POSY_ICON*40+19) ; Engrenage to fix
+    .byte >($a000+POSY_ICON*40+25) ; Music
 
 icons_list_low:
     .byte <info_icon        ; 0
@@ -99,6 +106,8 @@ icons_list_low:
     .byte <clock_icon       ; $0A
     .byte <chip_icon        ; $0B    
     .byte <exit_icon        ; $0C
+    .byte <engrenage_icon   ; $0D
+    .byte <music_icon       ; $0E
     
 icons_list_high:    
     .byte >info_icon
@@ -114,56 +123,58 @@ icons_list_high:
     .byte >clock_icon 
     .byte >chip_icon            
     .byte >exit_icon 
+    .byte >engrenage_icon 
+    .byte >music_icon
 
 reload_chip_icon:
-.byt $40,$5C,$40,$40,$40
-.byt $41,$7F,$40,$40,$40
-.byt $43,$63,$60,$40,$40
-.byt $43,$41,$60,$40,$40
-.byt $46,$40,$70,$58,$40
-.byt $46,$44,$71,$66,$40
-.byt $46,$46,$76,$41,$60
-.byt $43,$47,$70,$40,$58
-.byt $43,$67,$60,$41,$68
-.byt $41,$47,$70,$46,$48
-.byt $40,$47,$78,$58,$68
-.byt $41,$40,$41,$60,$78
-.byt $46,$40,$46,$49,$70
-.byt $47,$40,$58,$4E,$58
-.byt $47,$71,$62,$5C,$48
-.byt $47,$7E,$43,$66,$48
-.byt $47,$7C,$67,$42,$40
-.byt $41,$7C,$79,$62,$40
-.byt $40,$5D,$70,$60,$40
-.byt $40,$46,$58,$60,$40
-.byt $40,$40,$48,$40,$40
-.byt $40,$40,$48,$40,$40
-.byte $40,$40,$40,$40,$40
-.byte $40,$40,$40,$40,$40
+    .byt $40,$5C,$40,$40,$40
+    .byt $41,$7F,$40,$40,$40
+    .byt $43,$63,$60,$40,$40
+    .byt $43,$41,$60,$40,$40
+    .byt $46,$40,$70,$58,$40
+    .byt $46,$44,$71,$66,$40
+    .byt $46,$46,$76,$41,$60
+    .byt $43,$47,$70,$40,$58
+    .byt $43,$67,$60,$41,$68
+    .byt $41,$47,$70,$46,$48
+    .byt $40,$47,$78,$58,$68
+    .byt $41,$40,$41,$60,$78
+    .byt $46,$40,$46,$49,$70
+    .byt $47,$40,$58,$4E,$58
+    .byt $47,$71,$62,$5C,$48
+    .byt $47,$7E,$43,$66,$48
+    .byt $47,$7C,$67,$42,$40
+    .byt $41,$7C,$79,$62,$40
+    .byt $40,$5D,$70,$60,$40
+    .byt $40,$46,$58,$60,$40
+    .byt $40,$40,$48,$40,$40
+    .byt $40,$40,$48,$40,$40
+    .byt $40,$40,$40,$40,$40
+    .byt $40,$40,$40,$40,$40
 
 chip_in_icon:
-.byt $40,$5F,$40,$40,$40
-.byt $40,$51,$40,$40,$40
-.byt $40,$51,$40,$40,$40
-.byt $40,$51,$40,$40,$40
-.byt $41,$71,$73,$40,$40
-.byt $41,$40,$54,$70,$40
-.byt $40,$60,$60,$4C,$40
-.byt $40,$51,$40,$43,$40
-.byt $40,$4A,$40,$4D,$40
-.byt $40,$64,$40,$71,$40
-.byt $43,$40,$43,$45,$40
-.byt $4C,$40,$4C,$47,$40
-.byt $70,$40,$71,$4E,$40
-.byt $78,$43,$41,$73,$40
-.byt $7E,$4C,$53,$61,$40
-.byt $7F,$70,$5C,$71,$40
-.byt $7F,$64,$78,$50,$40
-.byt $4F,$67,$4C,$50,$40
-.byt $43,$6E,$44,$40,$40
-.byt $40,$73,$44,$40,$40
-.byt $40,$41,$40,$40,$40
-.byt $40,$41,$40,$40,$40
+    .byt $40,$5F,$40,$40,$40
+    .byt $40,$51,$40,$40,$40
+    .byt $40,$51,$40,$40,$40
+    .byt $40,$51,$40,$40,$40
+    .byt $41,$71,$73,$40,$40
+    .byt $41,$40,$54,$70,$40
+    .byt $40,$60,$60,$4C,$40
+    .byt $40,$51,$40,$43,$40
+    .byt $40,$4A,$40,$4D,$40
+    .byt $40,$64,$40,$71,$40
+    .byt $43,$40,$43,$45,$40
+    .byt $4C,$40,$4C,$47,$40
+    .byt $70,$40,$71,$4E,$40
+    .byt $78,$43,$41,$73,$40
+    .byt $7E,$4C,$53,$61,$40
+    .byt $7F,$70,$5C,$71,$40
+    .byt $7F,$64,$78,$50,$40
+    .byt $4F,$67,$4C,$50,$40
+    .byt $43,$6E,$44,$40,$40
+    .byt $40,$73,$44,$40,$40
+    .byt $40,$41,$40,$40,$40
+    .byt $40,$41,$40,$40,$40
 
 info_icon:
 .byte $41,$7f,$7f,$7f,$60
@@ -217,10 +228,6 @@ command_icon:
 .byte $60,$40,$43,$41,$40
 .byte $60,$40,$40,$41,$40
 .byte $7f,$7f,$7f,$7f,$40
-
-
-
-
 
 joy_icon:
 .byte $40,$40,$40,$40,$40
@@ -408,4 +415,23 @@ network_icon:
 .byt $50,$64,$49,$42,$40
 .byt $4F,$43,$70,$7C,$40
 .byt $55,$65,$59,$56,$40
-.byt $5F,$67,$79,$7E,$40
+    .byt $5F,$67,$79,$7E,$40
+
+music_icon:
+        .byt $40,$40,$40,$40,$40,$40,$40,$40,$40,$58,$40,$40,$40,$43,$78,$40
+        .byt $40,$40,$5f,$78,$40,$40,$43,$7c,$58,$40,$41,$7f,$60,$58,$40,$41
+        .byt $7c,$43,$78,$40,$41,$60,$5f,$78,$40,$41,$67,$7e,$58,$40,$41,$7f
+        .byt $60,$58,$40,$41,$78,$40,$58,$40,$41,$60,$40,$58,$40,$41,$60,$40
+        .byt $58,$40,$41,$60,$40,$58,$40,$41,$60,$40,$58,$40,$41,$60,$43,$58
+        .byt $40,$4d,$60,$47,$78,$40,$5f,$60,$4f,$78,$40,$7f,$60,$4f,$70,$40
+        .byt $7f,$40,$47,$60,$40,$5e,$40,$43,$40,$40,$4c,$40,$40,$40,$40,$40
+        .byt $40,$40,$40,$40,$40,$40,$40,$40
+
+engrenage_icon:
+    .byt $40,$40,$40,$40,$40,$43,$70,$40,$40,$43,$70,$40,$41,$43,$70,$60
+    .byt $43,$67,$79,$70,$47,$7f,$7f,$78,$43,$7f,$7f,$70,$41,$7f,$7f,$60
+    .byt $41,$7f,$7f,$60,$43,$7c,$4f,$70,$5f,$78,$47,$7e,$5f,$78,$47,$7e
+    .byt $5f,$78,$47,$7e,$5f,$78,$47,$7e,$43,$7c,$4f,$70,$41,$7f,$7f,$60
+    .byt $41,$7f,$7f,$60,$43,$7f,$7f,$70,$47,$7f,$7f,$78,$43,$67,$79,$70
+    .byt $41,$43,$70,$60,$40,$43,$70,$40,$40,$43,$70,$40,$40,$40,$40,$40
+        
