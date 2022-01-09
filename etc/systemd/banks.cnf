@@ -14,11 +14,3 @@ path=/usr/share/basic10/basic10.rom
 path=/usr/share/pravetzt/pravus1.rom
 [Pravetz (sdcard)]
 path=/usr/share/pravetzt/pravsd1.rom
-[Dflat test]
-path=/usr/share/systemd/roms/dflat10.rom
-[Dflat test]
-path=/usr/share/systemd/roms/dflattes.rom
-[Atmos FR 2drive)]
-path=/usr/share/systemd/roms/bas11fr2.rom
-[Atmos FR 2drive)]
-path=/usr/share/systemd/roms/bas11fr2.rom
