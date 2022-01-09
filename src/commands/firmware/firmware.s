@@ -65,8 +65,8 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     ldx     #TWIL_INFO_ICON_ID
     jsr     _blitIcon
 
-    ldx     #TWIL_ACTION_MEMORY_MENU
-    jsr     _blitIcon
+    ;ldx     #TWIL_ACTION_MEMORY_MENU
+    ;jsr     _blitIcon
 
     ;ldx     #TWIL_ACTION_UPGRADE_MENU
     ;jsr     _blitIcon
