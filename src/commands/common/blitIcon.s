@@ -72,7 +72,7 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+13) ; clock (firm3)
     .byte <($a000+POSY_ICON*40+1)  ; Rom for loader
     .byte <($a000+POSY_ICON*40+34) ; exit loader
-    .byte <($a000+POSY_ICON*40+19) ; Engrenage to fix
+    .byte <($a000+POSY_ICON*40+25) ; Engrenage to fix
     .byte <($a000+POSY_ICON*40+25) ; Music
     
 icons_list_pos_high:
@@ -89,7 +89,7 @@ icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+13) ; $0A   ; clock (firm3)
     .byte >($a000+POSY_ICON*40+1)  ; $0B Rom for launcher
     .byte >($a000+POSY_ICON*40+34) ; $0C Exit loader
-    .byte >($a000+POSY_ICON*40+19) ; Engrenage to fix
+    .byte >($a000+POSY_ICON*40+25) ; $0D Engrenage to fix
     .byte >($a000+POSY_ICON*40+25) ; Music
 
 icons_list_low:
