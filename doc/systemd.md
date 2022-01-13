@@ -23,7 +23,7 @@ It displays informations as :
 
 ## Twilighte loader
 
-Uses funct + T to launch the menu
+Uses funct + L to launch the menu
 
 ![alt text](loader2.jpg "firmware")
 

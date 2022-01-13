@@ -1,22 +1,29 @@
 
 .define CLOCK_POS_BAR $BB80+40*7+1
 .define CLOCK_POS_DATE $BB80+40*7+2+7
+.define CLOCK_POS_TIME $BB80+40*8+2+7
 
 .define CLOCK_COLOR_BAR $11
 
 
-.define HOUR $00
+.define HOUR    $00
 .define MINUTES $03
 .define SECONDS $06
 
-.define DAY $9
-.define MONTH $0C
-.define YEAR $0F
+.define DAY     $09
+.define MONTH   $0C
+.define YEAR    $0F
+
+;.define DAY     $10
+;.define MONTH   $0C+10
+;.define YEAR    $0F+10
 
 
 .proc _twil_menu_clock
     ldx     #$09
     jsr     printToFirmDisplay
+    ldx     #13
+    ;jsr     printToFirmDisplay    
 
     lda     #$00
     sta     pos_bar_date
@@ -57,6 +64,7 @@ display_date:
     lda     #' '
     sta     CLOCK_POS_DATE,x
     inx
+    ;ldx     #$00
 
 
     lda     DS1501_DATE_REGISTER
@@ -549,6 +557,27 @@ display:
     sta     CLOCK_POS_DATE,x
     inx
     rts
+
+display_time:  
+    pha
+    
+    ror
+    ror
+    ror
+    ror
+    and     #%00001111
+    tay
+    lda     bcd_table,y
+    sta     CLOCK_POS_TIME,x
+    inx
+    pla    
+    and     #%00001111
+    tay
+    lda     bcd_table,y
+    sta     CLOCK_POS_TIME,x
+    inx
+    rts
+
 bcd_table:    
     .byte "0"
     .byte "1"

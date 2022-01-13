@@ -183,6 +183,7 @@ index_software_ptr  := userzp+16 ; ptr computre
 
     rts        
 @exit_menu:
+    jsr     _loader_clear_bottom_text
     jsr     twil_interface_clear_menu
     lda     #TWIL_ICON_MUSIC_LOADER
     sta     twil_interface_current_menu
@@ -993,4 +994,5 @@ file_music_db:
     .asciiz "music.db"
 
 .include "_loader_launch_software.s"
+.include "_loader_clear_bottom_text.s"
 

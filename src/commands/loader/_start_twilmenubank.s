@@ -7,6 +7,7 @@
 BANK_LABEL=($BB80+40*7+2)
 
 .proc _start_twilmenubank
+    jsr     _loader_clear_bottom_text
 
     lda     #$00
     sta     line_number
