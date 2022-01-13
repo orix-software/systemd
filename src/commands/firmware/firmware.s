@@ -40,7 +40,7 @@
 .define TWIL_KEYBOARD_RIGHT       $09
 .define TWIL_KEYBOARD_ESC         27
 
-.define TWIL_FIRMWARE_WITH_RTC    $03
+.define TWIL_FIRMWARE_WITH_RTC    $04
 
 .define TWIL_ACTION_EXIT_FIRM3    $05
 
