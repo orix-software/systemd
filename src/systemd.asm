@@ -14,7 +14,7 @@
 .define TWIL_INTERFACE_NUMBER_OF_RAM_BANK       32
 .define TWIL_INTERFACE_NUMBER_OF_CHARS_IN_LABEL 8
 
-    userzp := $80
+    userzp := $80+20
 
     
 
