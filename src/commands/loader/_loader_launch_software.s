@@ -10,11 +10,15 @@ XEXEC = $63
 
     ; Looking for mode index_software_ptr
 
+
+
+
     ; Search first ; and get tape file
     ldy     #$00
     lda     (index_software_ptr),y
     sta     @L2+1
     sta     @L3+1
+    sta     @L302+1
     sta     @get_flag+1
 
     iny
@@ -22,6 +26,7 @@ XEXEC = $63
     lda     (index_software_ptr),y
     sta     @L2+2
     sta     @L3+2
+    sta     @L302+2
     sta     @get_flag+2
 
 
@@ -52,17 +57,55 @@ XEXEC = $63
 @end_software_name:
     iny
 
-    ; Now here we are getting the flag
+    ; Looking for flag now
+@L302:
+    lda     $dead,y
+    cmp     #';'
+    beq     @flag_found
+    iny
+    bne     @L302
+@flag_found:
+    iny
+
+
 @get_flag:
+
+
     lda     $dead,y
     cmp     #LOADER_LAUNCH_BASIC11_TAPE_FILE
     beq     @start_basic11_tape_file
 
+    cmp     #LOADER_LAUNCH_BASIC10_TAPE_FILE
+    beq     @start_basic10_tape_file
+
+    bne     @start_basic11_tape_file ; Default start basic11 if flag is unknown
+@start_basic10_tape_file:
+
+    ldy     #$00
+@L300:    
+    lda     basic10_exec_command,y
+    sta     basic11_exec_command,y
+    iny
+    cpy     #$07
+    bne     @L300
+
+    beq     @start_command
+
+@start_basic11_tape_file:    
+
+    ldy     #$00
+@L301:    
+    lda     basic11_exec_command,y
+    sta     basic11_exec_command,y
+    iny
+    cpy     #$07
+    bne     @L301
+
+
+@start_command:
 
 
 
-
-@start_basic11_tape_file:
 
 
     ldy     #$00
@@ -100,8 +143,7 @@ XEXEC = $63
     ldy     #>BUFEDT
     BRK_KERNEL XEXEC
 
-@me:
-    jmp     @me    
+
     
     lda     $200
     cmp     #ENOMEM
@@ -123,6 +165,8 @@ basic11_exec_command:
 basic11_name_tape_file:
     .res 15
 
+basic10_exec_command:
+    .asciiz "basic10"
 
 loader_biname:
     .asciiz "Loader"

@@ -2,7 +2,7 @@
 
 .define LOADER_COLOR_BAR                $11
 .define LOADER_CONF_SEPARATOR           ';'
-.define LOADER_MAX_SIZE_DB_SIZE         20000
+.define LOADER_MAX_SIZE_DB_SIZE         21000
 .define LOADER_FIRST_POSITION_BAR       $bb80+7*40+1
 .define LOADER_LAST_LINE_MENU_ITEM      18
 .define LOADER_MAX_SOFTWARE_BY_CATEGORY 2000
