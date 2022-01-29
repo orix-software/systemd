@@ -11,8 +11,6 @@ XEXEC = $63
     ; Looking for mode index_software_ptr
 
 
-
-
     ; Search first ; and get tape file
     ldy     #$00
     lda     (index_software_ptr),y
@@ -121,9 +119,7 @@ XEXEC = $63
     mfree   (ptr2)
     mfree   (index_software)
     jsr     exit_interface_confirmed
-    ;print   BUFEDT
-    ;rts
-     ;jsr     exit_interface_confirmed
+
     lda     #<BUFEDT
     ldy     #>BUFEDT
     BRK_KERNEL XEXEC
