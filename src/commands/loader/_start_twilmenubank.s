@@ -276,15 +276,17 @@ run:
 @continue:
     sta      buffer
     sta      buffer_bkp
+    sta      ptr3 
     sty      buffer+1
     sty      buffer_bkp+1
+    sty      ptr3+1
 	sta      PTR_READ_DEST
-    sta      ptr3   ; for compute
 	sty      PTR_READ_DEST+1
-    sty      ptr3+1 ; for compute
+
 
 
     fread (PTR_READ_DEST), MENU_ROM_LAUNCH_MAX_FILESIZE, 1, fp_banks_cnf ; myptr is from a malloc for example
+
 
 
     ; Do we read 0 bytes ?
@@ -299,11 +301,51 @@ run:
 
 @read_success:
 
-    fclose (fd_systemd)
-@again:
-    ;print     str_bank
+    ; Compute the bytes : return of fread
 
-     ;   jmp     @me    
+    lda      PTR_READ_DEST+1 ; 0C7E-0AA4
+    sec
+    sbc      ptr3+1
+    sta      ptr3+1
+
+    
+    lda      PTR_READ_DEST ; 7E
+ 
+    sec
+    sbc      ptr3
+    bcs      @nodecX
+    dec      ptr3+1
+@nodecX:
+    sta      ptr3   ; save length read
+;    stx      ptr3+1 ; for compute
+    fclose (fd_systemd)
+    ; Store $FF of EOF at the end
+
+    ; Compute the end of the file to store $ff in the last byte
+    lda      buffer+1
+    clc
+    adc      ptr3+1
+    sta      ptr3+1
+
+    lda      buffer
+    clc
+    adc      ptr3
+    bcc      @skip_inc
+    inc      ptr3+1
+@skip_inc:
+    sta      ptr3
+    sta      @store_me+1
+
+    lda      ptr3+1
+    sta      @store_me+2
+
+
+    lda      #$FF
+@store_me:
+    sta      $dead      ; Store $ff
+
+@again:
+
     jsr      read_inifile_section_bank_launcher
     cmp      #$01
     beq      no_chars
@@ -345,6 +387,8 @@ no_chars:
     lda      (buffer),y
     cmp      #'['
     beq      @out
+    cmp      #$FF
+    beq      @exit_read_label
     cmp      #$0D
     bne      @continue
     inc      line_number
@@ -358,6 +402,7 @@ no_chars:
     iny
     cpy      #MENU_ROM_LAUNCH_MAX_LINEZIZE
     bne      @L1
+@exit_read_label:    
     lda      #$01 ; Not found
     rts
 
