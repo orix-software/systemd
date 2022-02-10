@@ -29,6 +29,11 @@
     lda     #39
     sta     @__size1+1
     sta     @__size2+1
+    lda     #<($a001)
+    sta     @__modify2+1
+    lda     #>($a000+1)
+    sta     @__modify2+2
+
 
 
 @start:

@@ -6,6 +6,11 @@
 
 BANK_LABEL=($BB80+40*7+2)
 
+.define MENU_ROM_LAUNCH_MAX_FILESIZE 2000
+.define MENU_ROM_LAUNCH_MAX_LINEZIZE 100
+
+
+
 .proc _start_twilmenubank
     jsr     _loader_clear_bottom_text
 
@@ -40,12 +45,13 @@ BANK_LABEL=($BB80+40*7+2)
     bcc     @checkkey
 @exit:
     pha     ; Save key
+    jsr     _menubanks_clean_exit
     mfree(ptr1)
     pla
     rts
 
 @checkkey:
-    cmp     #27
+    cmp     #TWIL_KEYBOARD_ESC
     beq     @exit
     cmp     #$09
     beq     @exit
@@ -61,14 +67,19 @@ BANK_LABEL=($BB80+40*7+2)
 
 
 @go_enter:
-    jsr     _missing_file
+    ;jsr     _missing_file
+    ;BRK_KERNEL XSCRNE
     ldx     pos_y_bar
     lda     tab_path_bank_low,x
     sta     ptr1
     lda     tab_path_bank_high,x
     sta     ptr1+1
-    jmp     load_bank_routine_menu_bank    
-    
+    jsr     load_bank_routine_menu_bank
+
+
+
+    lda     #$01 ; Error
+    jmp     @exit
     
 
 @go_down:
@@ -132,6 +143,8 @@ BANK_LABEL=($BB80+40*7+2)
     print   str_error_path_not_found,NOSAVE
     print   (ptr1),NOSAVE
     BRK_KERNEL XCRLF
+
+    lda     #$01 ; Error
     rts
     
 @read:
@@ -142,23 +155,21 @@ BANK_LABEL=($BB80+40*7+2)
 
     ;Malloc 512 for routine + buffer 16384
     malloc   16896,ptr2,str_oom ; Malloc for the routine to copy into memory, but also the 16KB of the bank to load
-    lda      ptr2  ;
-    sta      ptr4
-    sta      PTR_READ_DEST
+    lda     ptr2  ;
+    sta     ptr4
+    sta     PTR_READ_DEST
     
-    ldy      ptr2+1
+    ldy     ptr2+1
 
     iny
     iny
-    sty      PTR_READ_DEST+1
-    sty      ptr4+1  ; contains the content of the rom
+    sty     PTR_READ_DEST+1
+    sty     ptr4+1  ; contains the content of the rom
 
     ; We read the file with the correct
-    lda     #<16384
-    ldy     #>16384
 
-    ; reads byte 
-    BRK_KERNEL XFREAD
+
+    fread (PTR_READ_DEST), 16384, 1, fd_systemd 
 
     ; copy the routine
 
@@ -221,8 +232,15 @@ run:
 .proc _missing_file
 	BRK_KERNEL XHIRES ; Hires
 	BRK_KERNEL XTEXT  ; and text
-	BRK_KERNEL XSCRNE
+	BRK_KERNEL XSCRNE ; Reload charset ?
 
+    rts
+.endproc
+
+.proc _menubanks_clean_exit
+    lda     buffer_bkp
+    ldy     buffer_bkp+1
+    BRK_KERNEL XFREE
     rts
 .endproc
 
@@ -241,8 +259,12 @@ run:
     print    str_not_found,NOSAVE
     rts
 @found:
+    ; Save FP
+    sta     fp_banks_cnf
+    stx     fp_banks_cnf+1
+
     ; fd_systemd is stored in open_file
-    malloc   1000,ptr1,str_oom           ; FIXME
+    malloc   MENU_ROM_LAUNCH_MAX_FILESIZE,ptr1,str_oom           ; FIXME
     cpy      #$00
     bne      @continue
     cmp      #$00
@@ -253,32 +275,22 @@ run:
 
 @continue:
     sta      buffer
+    sta      buffer_bkp
     sty      buffer+1
+    sty      buffer_bkp+1
 	sta      PTR_READ_DEST
     sta      ptr3   ; for compute
 	sty      PTR_READ_DEST+1
     sty      ptr3+1 ; for compute
 
 
+    fread (PTR_READ_DEST), MENU_ROM_LAUNCH_MAX_FILESIZE, 1, fp_banks_cnf ; myptr is from a malloc for example
 
 
-	lda      #<1000
-    ldy      #>1000
-
-	BRK_KERNEL XFREAD
-    
-    lda      PTR_READ_DEST+1
-    sec
-    sbc      ptr3+1
-    tax
-    lda      PTR_READ_DEST
-    sec
-    sbc      ptr3
-
-
+    ; Do we read 0 bytes ?
     cmp      #$00
     bne      @read_success
-    cpx      #$10
+    cpx      #$00           ; 
     bne      @read_success
     mfree    (buffer)
     fclose   (fd_systemd)    
@@ -291,10 +303,11 @@ run:
 @again:
     ;print     str_bank
 
-
+     ;   jmp     @me    
     jsr      read_inifile_section_bank_launcher
     cmp      #$01
     beq      no_chars
+
     jsr      read_inifile_path_bank_launcher
     cmp      #$01
     beq      no_path
@@ -325,7 +338,7 @@ no_chars:
 
 
 .proc read_inifile_section_bank_launcher
-MAX_LINE_SIZE_INI=100
+
 
     ldy      #$00
 @L1:    
@@ -338,11 +351,12 @@ MAX_LINE_SIZE_INI=100
     jmp      @continue
     cmp      #$0A
     bne      @continue
+    ; error 
     
     inc      line_number
 @continue:    
     iny
-    cpy      #MAX_LINE_SIZE_INI
+    cpy      #MENU_ROM_LAUNCH_MAX_LINEZIZE
     bne      @L1
     lda      #$01 ; Not found
     rts
@@ -360,12 +374,12 @@ MAX_LINE_SIZE_INI=100
     txa
     tay
     lda      saveA
-    sta      (ptr4),y
+    sta      (ptr4),y       ; Store to screen
     ldy      saveY
 
     inx
     iny
-    cpy      #MAX_LINE_SIZE_INI
+    cpy      #MENU_ROM_LAUNCH_MAX_LINEZIZE
     bne      @out2
     lda      #$01 ; Not found
     rts
@@ -410,7 +424,7 @@ MAX_LINE_SIZE_INI=100
 .endproc
 
 .proc read_inifile_path_bank_launcher
-MAX_LINE_SIZE_INI=100
+
 
 
     ldx      #$00
@@ -422,7 +436,7 @@ MAX_LINE_SIZE_INI=100
     cmp      #'=' ; We reach '=' It means that it's rom 
     beq      @path_found
     iny
-    cpy      #MAX_LINE_SIZE_INI
+    cpy      #MENU_ROM_LAUNCH_MAX_LINEZIZE
     bne      @L1
     lda      #$01 ; Not found
     rts
@@ -497,4 +511,9 @@ saveA:
 pos_y_bar: 
     .res 1
 line_number:
-    .res 1    
+    .res 1
+fp_banks_cnf:
+    .res 2
+buffer_bkp:
+    .res 2    
+

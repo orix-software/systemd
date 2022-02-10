@@ -2,7 +2,7 @@
 
 .define LOADER_COLOR_BAR                $11
 .define LOADER_CONF_SEPARATOR           ';'
-.define LOADER_MAX_SIZE_DB_SIZE         21000
+.define LOADER_MAX_SIZE_DB_SIZE         20000 ; Attention, quand cela passe à 21000 bug avec mes musiques OSID.
 .define LOADER_FIRST_POSITION_BAR       $bb80+7*40+1
 .define LOADER_LAST_LINE_MENU_ITEM      18
 .define LOADER_MAX_SOFTWARE_BY_CATEGORY 2000
@@ -60,6 +60,8 @@ index_software_ptr  := userzp+16 ; ptr computre
 @start_menu_bank:
     jsr     twil_interface_clear_menu
     jsr     _start_twilmenubank
+    cmp     #$01 ; Error does not clear screen
+    beq     @exit_loader
     cmp     #TWIL_KEYBOARD_ESC
     beq     @exit_loader
     ldx     pos_menu_loader_x
@@ -83,6 +85,9 @@ index_software_ptr  := userzp+16 ; ptr computre
 
     jsr     @display_menu_loader_software
     
+    cmp     #TWIL_KEYBOARD_ESC
+    beq     @exit_loader
+
     cmp     #TWIL_KEYBOARD_LEFT
     beq     @switch_to_menu_bank
 
@@ -117,6 +122,12 @@ index_software_ptr  := userzp+16 ; ptr computre
     beq     @check_right_game
     cmp     #TWIL_KEYBOARD_LEFT
     beq     @check_left_game
+    
+    
+    cmp     #TWIL_KEYBOARD_ESC
+   
+    beq     @exit_loader
+
 
     inc     twil_interface_current_menu
     jmp     @tools_menu
@@ -143,10 +154,18 @@ index_software_ptr  := userzp+16 ; ptr computre
 
     jsr     twil_interface_clear_menu
     jsr     @display_menu_loader_software
+    
+    cmp     #TWIL_KEYBOARD_ESC
+    bne     @go_to_next_menu_tools
+    jmp     @exit_loader
+
+@go_to_next_menu_tools:
+
     cmp     #TWIL_KEYBOARD_RIGHT
     beq     @music_menu
     cmp     #TWIL_KEYBOARD_LEFT
     bne     @check_esc_tools_menu 
+
 
     lda     #$00
     jsr     twil_interface_change_menu
@@ -171,8 +190,18 @@ index_software_ptr  := userzp+16 ; ptr computre
     jsr     @display_menu_loader_software
     cmp     #TWIL_KEYBOARD_RIGHT
     beq     @exit_menu 
+
+    cmp     #TWIL_KEYBOARD_ESC
+    bne     @go_to_next_menu_music
+    jmp     @exit_loader
+
+
+@go_to_next_menu_music:
+
     cmp     #TWIL_KEYBOARD_LEFT
     bne     @check_esc_tools_menu 
+    
+
 
     lda     #$00
     jsr     twil_interface_change_menu
@@ -337,9 +366,12 @@ index_software_ptr  := userzp+16 ; ptr computre
 .endproc
 
 .proc exit_interface_confirmed
+    cmp     #$01 ; Error and screen already clear ?
+    beq     @out      ; Yes
 	BRK_KERNEL XHIRES ; Hires
 	BRK_KERNEL XTEXT  ; and text
 	BRK_KERNEL XSCRNE
+@out:    
     rts
 .endproc
 
@@ -540,6 +572,8 @@ index_software_ptr  := userzp+16 ; ptr computre
     cmp     #TWIL_KEYBOARD_LEFT
     beq     @exit_listing
     cmp     #TWIL_KEYBOARD_RIGHT
+    beq     @exit_listing
+    cmp     #TWIL_KEYBOARD_ESC
     beq     @exit_listing
     cmp     #10
     beq     @go_down        

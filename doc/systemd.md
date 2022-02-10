@@ -9,7 +9,7 @@ Systemd.rom must be in /usr/share/systemd folder (systemd.rom) and can be downlo
 
 ## Twilighte setup
 
-Uses funct + T to launch the menu
+Uses *funct + T* to launch the menu
 
 ![alt text](firmware.jpg "firmware")
 
