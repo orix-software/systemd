@@ -2,7 +2,7 @@
 
 .define LOADER_COLOR_BAR                $11
 .define LOADER_CONF_SEPARATOR           ';'
-.define LOADER_MAX_SIZE_DB_SIZE         20000 ; Attention, quand cela passe à 21000 bug avec mes musiques OSID.
+.define LOADER_MAX_SIZE_DB_SIZE         22000 ; Attention, quand cela passe à 21000 bug avec mes musiques OSID.
 .define LOADER_FIRST_POSITION_BAR       $bb80+7*40+1
 .define LOADER_LAST_LINE_MENU_ITEM      18
 .define LOADER_MAX_SOFTWARE_BY_CATEGORY 2000
@@ -276,6 +276,7 @@ index_software_ptr  := userzp+16 ; ptr computre
     cpy     #$00
     bne     @not_oom
     ; FIX OOM
+    lda     #TWIL_KEYBOARD_ESC
     jsr     exit_interface_confirmed
     print   str_oom,NOSAVE
     rts
@@ -332,7 +333,7 @@ index_software_ptr  := userzp+16 ; ptr computre
 
     mfree   (ptr2)
     
-    malloc  LOADER_MAX_SIZE_DB_SIZE,ptr2 ; 20000 bytes
+    malloc  #LOADER_MAX_SIZE_DB_SIZE,ptr2 ; 20000 bytes
     cmp     #$00
     bne     @not_oom_file_content
     cpy     #$00
@@ -345,9 +346,6 @@ index_software_ptr  := userzp+16 ; ptr computre
 
 @not_oom_file_content:
 
-    ;lda     ptr2
-    ;sta     ptr3_loader
-    ;ldx     ptr2+1
 
     fread (ptr2), LOADER_MAX_SIZE_DB_SIZE, 1, fp_file_menu
     fclose(fp_file_menu)
@@ -357,8 +355,6 @@ index_software_ptr  := userzp+16 ; ptr computre
     pha
     mfree(index_software)
     mfree(ptr2)
-  
-
 ;    jsr     _debug_lsmem
   
     pla

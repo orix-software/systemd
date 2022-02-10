@@ -116,8 +116,9 @@ XEXEC = $63
 @out:
     sta     BUFEDT,y
 
-    mfree   (ptr2)
     mfree   (index_software)
+    mfree   (ptr2)
+    
     jsr     exit_interface_confirmed
 
     lda     #<BUFEDT
