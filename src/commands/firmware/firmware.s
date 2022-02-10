@@ -36,8 +36,11 @@
 .define TWIL_GEAR_ICON_ID         $0D
 
 
+
 .include "../common/keyboard.inc"
 .define TWIL_FIRMWARE_WITH_RTC    $03
+
+
 
 .define TWIL_ACTION_EXIT_FIRM3    $05
 
