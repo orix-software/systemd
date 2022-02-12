@@ -35,10 +35,14 @@ BANK_LABEL=($BB80+40*7+2)
 
     lda     #$00
     sta     number_of_roms_in_banks_cnf
+    sta     number_of_roms_in_banks_cnf+1
 
     jsr     read_banks_bank_launcher
 
     jsr     @display_bar
+
+
+    jsr     debug_loader_rom 
 @read_keyboard:
     BRK_TELEMON XRDW0            ; read keyboard
     asl     KBDCTC
@@ -83,6 +87,7 @@ BANK_LABEL=($BB80+40*7+2)
     
 
 @go_down:
+
     lda     pos_y_bar
     cmp     number_of_roms_in_banks_cnf
     beq     @read_keyboard
@@ -96,7 +101,8 @@ BANK_LABEL=($BB80+40*7+2)
     inc     @__store_bar+2
 @S_DOWN:
     sta     @__store_bar+1
-    jsr     @display_bar    
+    jsr     @display_bar
+    jsr     debug_loader_rom
     jmp     @read_keyboard
 
 @go_up:
@@ -114,7 +120,8 @@ BANK_LABEL=($BB80+40*7+2)
     dec     @__store_bar+2
 @S_UP:
     sta     @__store_bar+1
-    jsr     @display_bar 
+    jsr     @display_bar
+    jsr     debug_loader_rom 
 @do_not_go_up:       
     jmp     @read_keyboard
 
@@ -535,12 +542,57 @@ no_chars:
 
 .endproc
 
+
+.proc debug_loader_rom
+
+    lda     #<(LOADER_POS_INF_NUMBER)
+    sta     TR5
+    lda     #>(LOADER_POS_INF_NUMBER)
+    sta     TR5+1
+
+    lda     #$20
+    sta     DEFAFF
+
+    ldx     #$01
+    ldy     #$00
+    
+    lda     pos_y_bar
+    clc
+    adc     #$01
+    bcc     @S1
+    iny
+@S1:    
+    BRK_KERNEL XBINDX
+
+    lda     #'/'
+    sta     LOADER_POS_INF_NUMBER+3
+
+
+    lda     #<(LOADER_POS_INF_NUMBER+4)
+    sta     TR5
+    lda     #>(LOADER_POS_INF_NUMBER+4)
+    sta     TR5+1
+
+    lda     #$20
+    sta     DEFAFF
+
+    ldx     #$01
+    ldy     number_of_roms_in_banks_cnf+1
+    lda     number_of_roms_in_banks_cnf
+    clc     
+    adc     #$01 ; Add 1 for total
+    BRK_KERNEL XBINDX    
+
+    rts
+.endproc
+
+
 tab_path_bank_low:
     .res MAX_BANK_TO_DISPLAY
 tab_path_bank_high:
     .res MAX_BANK_TO_DISPLAY    
 number_of_roms_in_banks_cnf:
-    .res 1
+    .res 2
 
 str_path_is_missing:
     .asciiz "file is missing in /etc/systemd/banks.cnf line : "

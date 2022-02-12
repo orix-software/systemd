@@ -50,8 +50,9 @@
 ; $c006
 
     jmp     _loader
-
+   ; jmp     $c006 ; for dbug
 _systemd:
+
 
 .proc systemd_start
 
