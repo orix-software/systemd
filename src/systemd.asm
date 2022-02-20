@@ -14,7 +14,7 @@
 .define TWIL_INTERFACE_NUMBER_OF_RAM_BANK       32
 .define TWIL_INTERFACE_NUMBER_OF_CHARS_IN_LABEL 8
 
-    userzp := $80+20
+    userzp := $80+30
 
     
 
@@ -50,8 +50,9 @@
 ; $c006
 
     jmp     _loader
-
+   ; jmp     $c006 ; for dbug
 _systemd:
+
 
 .proc systemd_start
 
@@ -533,11 +534,16 @@ bank:
 .endproc
 
 command0_str:
-        .ASCIIZ "systemd"
+       .ASCIIZ "twiconf"
 command1_str:
-       .ASCIIZ "twilconf"
+       .ASCIIZ "twiload"       
+;.ASCIIZ "systemd"
+;command1_str:
+
 commands_text:
 commands_address:
+    .addr _start_twilfirmware
+    .addr _loader    
 commands_version:
         .ASCIIZ "0.0.1"
 
@@ -564,7 +570,7 @@ list_commands:
         .addr command0_str
 ; $fff7
 number_of_commands:
-        .byt 1
+        .byt 2
 signature_address:
         .word   rom_signature
 

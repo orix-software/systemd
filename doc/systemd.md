@@ -1,15 +1,15 @@
-# Systemd Rom (beta)
+# Systemd Rom
 
-Systemd is located in /usr/share/systemd folder (systemd.rom).
+Systemd is located in /usr/share/systemd folder (systemd.rom) and provides loader and firmware meny
 
 ## Requires
 
-This roms requires at least Orix 2021.4 (kernel : 2021.4 and Shell : 2021.4)
+This roms requires at least Orix 2022.1 (kernel : 2022.1 and Shell : 2022.1)
 Systemd.rom must be in /usr/share/systemd folder (systemd.rom) and can be downloaded here : http://repo.orix.oric.org/dists/official/tgz/6502/systemd.tgz
 
 ## Twilighte setup
 
-Uses funct + T to launch the menu
+Uses *funct + T* to launch the menu
 
 ![alt text](firmware.jpg "firmware")
 
@@ -20,6 +20,10 @@ It displays informations as :
 * The default storage : It's provided by kernel rom. If kernel usb is installed, usb device is the default storage.
 * Usb firmware version : The firmware of the usb controler
 * Microdisc register : if it's present, some extra software can works : ripped, Osid music etc, and cumulus can be plugged Floppy disk can be started
+
+### Displays all Orix roms
+
+![alt text](firmware_bank_display.jpg "Displays bank")
 
 ## Twilighte loader
 
