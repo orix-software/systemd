@@ -20,7 +20,12 @@ rem
 %CC65%\ca65.exe -ttelestrat --include-dir %CC65%\asminc\ src/%ROM%.asm -o %ROM%.ld65  
 %CC65%\ld65.exe -tnone  %ROM%.ld65 -o %ROM%.rom 
 
+%CC65%\cl65.exe -ttelestrat src/commands/twilconf/main.c libs/lib8/twil.lib -o twiconf
+%CC65%\cl65.exe -ttelestrat src/commands/loader/main.c libs/lib8/twil.lib -o twiload
+
 IF "%1"=="NORUN" GOTO End
+copy twiconf %ORICUTRON%\sdcard\bin\t > NUL
+copy twiload %ORICUTRON%\sdcard\bin\l > NUL
 copy %ROM%.rom %ORICUTRON%\sdcard\usr\share\systemd\ > NUL
 copy %ROM%.rom %ORICUTRON%\roms > NUL
 mkdir %ORICUTRON%\sdcard\etc\systemd
