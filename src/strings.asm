@@ -22,7 +22,7 @@ str_oom:
 rom_signature:
 	.byte   "Systemd " ; Space must be present
 version:    
-    .asciiz "v2022.1.2"
+    .asciiz "v2022.1.3"
 
 str_bank: 
     .asciiz "  "

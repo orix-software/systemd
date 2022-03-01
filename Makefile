@@ -52,7 +52,9 @@ MYDATE = $(shell date +"%Y-%m-%d %H:%m")
 code: $(SOURCE)
 	$(AS) -I libs/usr/include/ $(CFLAGS)  $(SOURCE) $(LDFILES) -o $(PROGRAM).ld65
 	$(LD) -tnone -o $(PROGRAM).rom  $(PROGRAM).ld65
-	mkdir build/usr/share/systemd/$(VERSION) -p  && cp $(PROGRAM).rom build/usr/share/systemd/$(VERSION)/$(PROGRAM).rom  && cp $(PROGRAM).rom build/usr/share/systemd/$(PROGRAM).rom 
+	mkdir build/bin &&  mkdir build/usr/share/systemd/$(VERSION) -p  && cp $(PROGRAM).rom build/usr/share/systemd/$(VERSION)/$(PROGRAM).rom  && cp $(PROGRAM).rom build/usr/share/systemd/$(PROGRAM).rom 
+	$(CC) -ttelestrat src/commands/twilconf/main.c libs/lib8/twil.lib -o build/bin/twiconf
+	$(CCF) -ttelestrat src/commands/loader/main.c libs/lib8/twil.lib -o build/bin/twiload
 
 
 srccode: $(SOURCE)
