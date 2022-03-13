@@ -1,6 +1,6 @@
 
 str_not_found:
-    .asciiz "Not found"
+    .asciiz "not found"
 
 str_reading_modules:
     .byte " Loading modules ...",$0D,$0A,$00

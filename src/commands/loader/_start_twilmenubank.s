@@ -2,20 +2,22 @@
 .define MENU_BANK_LOADER    $01
 .define BANK_BAR_COLOR      $11
 
-.define MAX_BANK_TO_DISPLAY 20
+
 
 BANK_LABEL=($BB80+40*7+2)
 
-.define MENU_ROM_LAUNCH_MAX_FILESIZE 2000
-.define MENU_ROM_LAUNCH_MAX_LINEZIZE 100
-
-
+.define MENU_ROM_LAUNCH_MAX_FILESIZE 6000 ; Max file size of banks.cnf
+.define MENU_ROM_LAUNCH_MAX_LINEZIZE 100 ; Max Line when we try to parse  [Label] or path=, if it's longer the string is skipped
+.define MENU_ROM_MAX_LINE_LABEL      37  ; Max length of the label displayed on screen
 
 .proc _start_twilmenubank
-    jsr     _loader_clear_bottom_text
+    jsr     _loader_clear_bottom_text ; Clear bottom text
 
     lda     #$00
-    sta     line_number
+    sta     pos_y_on_screen
+    sta     skip_display
+    sta     nb_of_max_pos_y
+    sta     go_up
 
     lda     #$00
     sta     pos_y_bar
@@ -38,11 +40,21 @@ BANK_LABEL=($BB80+40*7+2)
     sta     number_of_roms_in_banks_cnf+1
 
     jsr     read_banks_bank_launcher
+    cpx     #$FF
+    bne     @banks_cnf_present
+    cmp     #$FF
+    bne     @banks_cnf_present
+    lda     #$01
+    rts
+@banks_cnf_present:
 
     jsr     @display_bar
 
 
     jsr     debug_loader_rom 
+
+    jsr     seek_label_next
+
 @read_keyboard:
     BRK_TELEMON XRDW0            ; read keyboard
     asl     KBDCTC
@@ -71,13 +83,15 @@ BANK_LABEL=($BB80+40*7+2)
 
 
 @go_enter:
-    ;jsr     _missing_file
-    ;BRK_KERNEL XSCRNE
-    ldx     pos_y_bar
-    lda     tab_path_bank_low,x
+
+
+    lda     ptr_current_path
     sta     ptr1
-    lda     tab_path_bank_high,x
+    lda     ptr_current_path+1
     sta     ptr1+1
+
+    
+    ; FIXME PATH
     jsr     load_bank_routine_menu_bank
 
 
@@ -87,11 +101,57 @@ BANK_LABEL=($BB80+40*7+2)
     
 
 @go_down:
-
     lda     pos_y_bar
+    clc
+    adc     #$01
     cmp     number_of_roms_in_banks_cnf
     beq     @read_keyboard
+
+
+
+    lda     pos_y_on_screen
+    cmp     #17
+    
+    bne     @continue_go_down
+
     jsr     @erase_bar
+
+    jsr     doscrollupinframe
+   ; jsr     @display_bar
+
+    jsr     seek_label_next
+
+    lda     ptr_current_label
+    sta     RES
+    lda     ptr_current_label+1
+    sta     RES+1
+
+    ldy     #$00
+@loop300:
+    lda     (RES),y
+    cmp     #$ff
+    beq     @continue_down_check
+    cmp     #']'
+    beq     @continue_down_check
+    sta     $bb80+40*24+2,y
+@continue300:
+    iny
+    cpy     #MENU_ROM_MAX_LINE_LABEL
+    beq     @continue_down_check
+    bne     @loop300
+@continue_down_check:
+    inc     pos_y_bar
+   ; jsr     debug_loader_rom 
+
+    jsr     @display_bar_and_display_infos
+    jmp     @read_keyboard
+
+@continue_go_down:
+   
+    jsr     seek_label_next
+    inc     pos_y_on_screen
+    jsr     @erase_bar
+
 @do_not_erase_bar:   
     inc     pos_y_bar
     lda     @__store_bar+1
@@ -101,15 +161,29 @@ BANK_LABEL=($BB80+40*7+2)
     inc     @__store_bar+2
 @S_DOWN:
     sta     @__store_bar+1
-    jsr     @display_bar
-    jsr     debug_loader_rom
+
+    jsr     @display_bar_and_display_infos
+    ;jsr     @display_bar
+    ;jsr     debug_loader_rom
+
+    ;lda     #$00
+    ;sta     go_up
+
     jmp     @read_keyboard
 
 @go_up:
-    lda     pos_y_bar
-    beq     @do_not_go_up
+    ;lda     go_up
+    ;bne     @do_not_update
+    ;inc     go_up
+  ;  jsr     seek_label_before
+   ; jsr     seek_label_before
+
+@do_not_update:
+
+    lda     pos_y_on_screen
+    beq     @check_if_first_rom
     jsr     @erase_bar
-  
+    dec     pos_y_on_screen
     dec     pos_y_bar
 
 
@@ -120,10 +194,55 @@ BANK_LABEL=($BB80+40*7+2)
     dec     @__store_bar+2
 @S_UP:
     sta     @__store_bar+1
+
     jsr     @display_bar
     jsr     debug_loader_rom 
+    jsr     seek_label_before
 @do_not_go_up:       
     jmp     @read_keyboard
+
+@check_if_first_rom:
+    lda     pos_y_bar
+    cmp     #$00
+    beq     @no_scroll_up
+
+    jsr     @erase_bar
+
+    jsr     doscrolldowninframe
+    
+    jsr     seek_label_before
+
+
+    lda     ptr_current_label
+    sta     RES
+    lda     ptr_current_label+1
+    sta     RES+1
+
+    ldy     #$00
+@loop301:
+    lda     (RES),y
+    cmp     #']'
+    beq     @continue_up_check
+    sta     $bb80+40*7+2,y
+@continue301:
+    iny
+    cpy     #MENU_ROM_MAX_LINE_LABEL
+    beq     @continue_up_check
+    bne     @loop301
+
+
+
+@continue_up_check:
+    dec     pos_y_bar
+    jsr     @display_bar_and_display_infos
+    ;jsr     debug_loader_rom
+
+
+  ;  jmp     @read_keyboard
+
+@no_scroll_up:
+    jmp     @read_keyboard
+
 
 
 @display_bar:
@@ -136,6 +255,10 @@ BANK_LABEL=($BB80+40*7+2)
     sta     BANK_LABEL-1
     rts
 
+@display_bar_and_display_infos:
+    jsr     @display_bar
+    jsr     debug_loader_rom 
+    rts
 .endproc
 
 .proc load_bank_routine_menu_bank
@@ -240,7 +363,6 @@ run:
 	BRK_KERNEL XHIRES ; Hires
 	BRK_KERNEL XTEXT  ; and text
 	BRK_KERNEL XSCRNE ; Reload charset ?
-
     rts
 .endproc
 
@@ -262,8 +384,14 @@ run:
     bne      @found
     cmp      #$FF 
     bne      @found
+     jsr      _missing_file
     print    path_banks,NOSAVE
+    lda      #' '
+    BRK_KERNEL XWR0
     print    str_not_found,NOSAVE
+    BRK_KERNEL XCRLF
+    lda      #$FF
+    tax
     rts
 @found:
     ; Save FP
@@ -290,11 +418,7 @@ run:
 	sta      PTR_READ_DEST
 	sty      PTR_READ_DEST+1
 
-
-
     fread (PTR_READ_DEST), MENU_ROM_LAUNCH_MAX_FILESIZE, 1, fp_banks_cnf ; myptr is from a malloc for example
-
-
 
     ; Do we read 0 bytes ?
     cmp      #$00
@@ -337,6 +461,7 @@ run:
     lda      buffer
     clc
     adc      ptr3
+    
     bcc      @skip_inc
     inc      ptr3+1
 @skip_inc:
@@ -346,12 +471,32 @@ run:
     lda      ptr3+1
     sta      @store_me+2
 
-
-    lda      #$FF
+    ; Theses lines does the step at the end of the memory of banks.cnf : \0,$FF (Because last entry of path= has no \0 in this case, and $FF is used to detect EOF)
+    ldx      #$00
+    lda      #$00
 @store_me:
-    sta      $dead      ; Store $ff
+    sta      $dead,x      ; Store $ff
+    lda      #$FF
+    inx
+    cpx      #$02
+    bne      @store_me
 
 @again:
+    ; ptr_current_label contains the first entry of banks.cnf
+    lda      buffer_bkp
+    sta      ptr_current_label
+    
+    lda      buffer_bkp+1
+    sta      ptr_current_label+1
+    
+
+
+    jsr      seek_path
+
+
+
+
+
 
     jsr      read_inifile_section_bank_launcher
     cmp      #$01
@@ -367,21 +512,119 @@ run:
 
  
 no_path:   
-    ;jsr     _missing_file
-    ;print   str_path_is_missing,NOSAVE
-    ;lda     line_number
-    ;ldx     #$02
-    ;stx     DEFAFF
-    ;ldy     #$00
-    ;BRK_KERNEL XDECIM
-    ;lda     #$01 ; error
-    ;rts
-    ;print   str_failed,NOSAVE
+
 
 no_chars:
-   ; print str_done,NOSAVE
-    dec     number_of_roms_in_banks_cnf
     lda     #$01 ; error
+    rts
+.endproc
+
+.proc seek_path
+    lda      ptr_current_label
+    sta      RES
+    sta      ptr_current_path
+
+    lda      ptr_current_label+1
+    sta      ptr_current_path+1
+    sta      RES+1
+    
+
+    ; Looking for =
+    ldy      #$00
+@loop200:    
+    lda      (RES),y
+    cmp      #'='
+    beq      @exit
+    iny
+    bne      @loop200
+@exit:    
+    ; = found 
+    iny
+    tya
+    clc
+    adc      ptr_current_path
+    bcc      @skip_inc_200
+    inc      ptr_current_path+1
+@skip_inc_200:    
+    sta      ptr_current_path
+
+    rts
+.endproc
+
+.proc seek_label_next
+    lda      ptr_current_label
+    sta      RES
+    lda      ptr_current_label+1
+    sta      RES+1
+    
+
+    ; Looking for =
+    ldy      #$01
+@loop200:    
+    lda      (RES),y
+    cmp      #'['
+    beq      @found      
+    iny
+    bne      @loop200
+@found:    
+    ; = found 
+    iny
+    tya
+    clc
+    adc      ptr_current_label
+    bcc      @skip_inc_200
+    inc      ptr_current_label+1
+@skip_inc_200:    
+    sta      ptr_current_label
+    jsr      seek_path
+
+
+
+    rts
+.endproc
+
+
+.proc seek_label_before
+
+    lda      ptr_current_label+1
+    sta      RES+1
+    
+
+    lda      ptr_current_label
+    sec
+    sbc      #$02
+    bcs      @do_not_dec
+    dec      RES+1
+@do_not_dec:    
+    sta      RES
+
+    ; Looking for =
+    ldy      #$00
+@loop200:    
+    lda      (RES),y
+    cmp      #'['
+    beq      @found
+    dec      RES
+    bne      @skip      
+    dec      RES+1
+@skip:    
+    bne      @loop200
+@found:    
+    ; = found
+
+    lda     RES+1
+    sta     ptr_current_label+1
+
+    lda     RES 
+    clc
+    adc     #$01
+    bcc     @skip2
+    dec     ptr_current_label+1
+@skip2:
+    sta     ptr_current_label
+
+    jsr     seek_path
+
     rts
 .endproc
 
@@ -398,18 +641,19 @@ no_chars:
     beq      @exit_read_label
     cmp      #$0D
     bne      @continue
-    inc      line_number
+
     jmp      @continue
     cmp      #$0A
     bne      @continue
     ; error 
     
-    inc      line_number
+
 @continue:    
     iny
     cpy      #MENU_ROM_LAUNCH_MAX_LINEZIZE
     bne      @L1
-@exit_read_label:    
+@exit_read_label:
+
     lda      #$01 ; Not found
     rts
 
@@ -421,12 +665,23 @@ no_chars:
     lda      (buffer),y
     cmp      #']'
     beq      @out3
+
     sta      saveA
     sty      saveY
+
+    cpx      #MENU_ROM_MAX_LINE_LABEL
+    bcs      @skip_display_label
+
     txa
     tay
+   
+    
+    lda      skip_display
+    bne      @skip_display_label
+
     lda      saveA
     sta      (ptr4),y       ; Store to screen
+@skip_display_label:    
     ldy      saveY
 
     inx
@@ -436,6 +691,8 @@ no_chars:
     lda      #$01 ; Not found
     rts
 @out3:
+
+    inc      number_of_roms_in_banks_cnf
     tya
     clc
     adc      buffer
@@ -451,7 +708,23 @@ no_chars:
     inc      ptr4+1
 @S6:
     sta      ptr4
-    inc      number_of_roms_in_banks_cnf
+
+
+
+    lda      nb_of_max_pos_y
+    cmp      #17
+    bne      @skip_bottom_page
+
+    lda      #$01
+    sta      skip_display
+    bne      @exit_manage_display
+
+    
+@skip_bottom_page:
+    inc      nb_of_max_pos_y
+
+
+@exit_manage_display:
 
     lda      #$00
     rts
@@ -464,7 +737,7 @@ no_chars:
     beq      @out4       
     cmp      #$0A
     beq      @out4
-    inc      line_number
+
 
     iny
     bne      @L2
@@ -477,14 +750,11 @@ no_chars:
 
 .proc read_inifile_path_bank_launcher
 
-
-
     ldx      #$00
     ldy      #$00
 @L1:    
     lda      (buffer),y
-    cmp      str_token_path_bank_menu,x ; We reach path ? yes
-    beq      @out
+
     cmp      #'=' ; We reach '=' It means that it's rom 
     beq      @path_found
     iny
@@ -524,18 +794,9 @@ no_chars:
     rts
 
 @out4:
-        
 
     lda      #$00    
     sta      (buffer),y
-
-    ; Now store to buffer
-    ldx      number_of_roms_in_banks_cnf
-    dex      ; Because it's incremented before
-    lda      buffer
-    sta      tab_path_bank_low,x
-    lda      buffer+1
-    sta      tab_path_bank_high,x
 
     rts
 
@@ -579,26 +840,12 @@ no_chars:
     ldx     #$01
     ldy     number_of_roms_in_banks_cnf+1
     lda     number_of_roms_in_banks_cnf
-    clc     
-    adc     #$01 ; Add 1 for total
     BRK_KERNEL XBINDX    
-
     rts
 .endproc
 
-
-tab_path_bank_low:
-    .res MAX_BANK_TO_DISPLAY
-tab_path_bank_high:
-    .res MAX_BANK_TO_DISPLAY    
 number_of_roms_in_banks_cnf:
-    .res 2
-
-str_path_is_missing:
-    .asciiz "file is missing in /etc/systemd/banks.cnf line : "
-
-str_token_path_bank_menu:
-    .asciiz "file"   
+    .res     2
 saveY:
     .res     1
 saveX:
@@ -606,11 +853,21 @@ saveX:
 saveA:
     .res     1
 pos_y_bar: 
-    .res 1
-line_number:
-    .res 1
+    .res     1
+pos_y_on_screen:
+    .res     1
 fp_banks_cnf:
-    .res 2
+    .res     2
 buffer_bkp:
-    .res 2    
+    .res     2  
+skip_display:
+    .byte    0
+nb_of_max_pos_y:
+    .byte    0
+ptr_current_label:
+    .res     2
+ptr_current_path:
+    .res     2
+go_up:
+    .res     1
 

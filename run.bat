@@ -26,11 +26,12 @@ rem
 IF "%1"=="NORUN" GOTO End
 copy twiconf %ORICUTRON%\sdcard\bin\t > NUL
 copy twiload %ORICUTRON%\sdcard\bin\l > NUL
+
 copy %ROM%.rom %ORICUTRON%\sdcard\usr\share\systemd\ > NUL
 copy %ROM%.rom %ORICUTRON%\roms > NUL
 mkdir %ORICUTRON%\sdcard\etc\systemd
 copy etc\systemd\modules %ORICUTRON%\sdcard\etc\systemd > NUL
-copy etc\systemd\banks.cnf %ORICUTRON%\sdcard\etc\systemd > NUL
+rem copy etc\systemd\banks.cnf %ORICUTRON%\sdcard\etc\systemd > NUL
 
 cd %ORICUTRON%
 
