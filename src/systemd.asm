@@ -421,6 +421,8 @@ run:
 
     
     mfree(ptr1)
+    ldx     #$ff
+    txa
     rts
 @read:
     sta     fd_systemd

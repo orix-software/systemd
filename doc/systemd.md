@@ -1,6 +1,6 @@
-# Systemd Rom
+# Systemd Rom v2022.1.2
 
-Systemd is located in /usr/share/systemd folder (systemd.rom) and provides loader and firmware meny
+Systemd is located in /usr/share/systemd folder (systemd.rom) and provides loader and firmware menu
 
 ## Requires
 
@@ -9,7 +9,7 @@ Systemd.rom must be in /usr/share/systemd folder (systemd.rom) and can be downlo
 
 ## Twilighte setup
 
-Uses *funct + T* to launch the menu
+Uses *funct + T* to launch the menu or type "twiconf" if you have Oric-1 keyboard
 
 ![alt text](firmware.jpg "firmware")
 
@@ -27,7 +27,7 @@ It displays informations as :
 
 ## Twilighte loader
 
-Uses funct + L to launch the menu
+Uses funct + L to launch the menu or type "twiload" if you have Oric-1 keyboard
 
 ![alt text](loader2.jpg "firmware")
 
@@ -39,6 +39,17 @@ You can select the rom you want to start :
 and others Roms
 
 Loader can starts tape file as atmos .tap file by category (demo, games).
+
+Demo, games, tools, music categories displays atmos tape file and Oric-1 tapes files. It means that loader is able to start atmos software only and Oric-1 only.
+
+In order to avoid 2 softwares for Oric-1 and another one for atmos when it's available for theses 2 machines, the choice is that loader displays atmos tape file, and if the software does not exist on the atmos, Oric-1 version is displayed.
+
+Number of software for each category since 2/3/2022
+
+* Demo : 22
+* Games : 677
+* Tools : 117
+* Music : 80
 
 ## Issues
 
