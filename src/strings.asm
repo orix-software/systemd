@@ -1,6 +1,6 @@
 
 str_not_found:
-    .asciiz "Not found"
+    .asciiz "not found"
 
 str_reading_modules:
     .byte " Loading modules ...",$0D,$0A,$00
@@ -22,7 +22,7 @@ str_oom:
 rom_signature:
 	.byte   "Systemd " ; Space must be present
 version:    
-    .asciiz "v2022.1.2"
+    .asciiz "v2022.1.3"
 
 str_bank: 
     .asciiz "  "
