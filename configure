@@ -6,7 +6,7 @@ rm libs/ch376lib.tgz
 
 
 
-curl --insecure -o libs/twillib.tgz http://repo.orix.oric.org/dists/2021.3/tgz/6502/twillib.tgz
+curl --insecure -o libs/twillib.tgz http://repo.orix.oric.org/dists/2022.1/tgz/6502/twillib.tgz
 cd libs/ && tar xvfz twillib.tgz && cd ..
 rm libs/twillib.tgz
 
