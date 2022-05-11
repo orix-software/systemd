@@ -55,7 +55,7 @@
     cmp     #';'
     bne     @restart
     iny
-
+;$0ca2
     lda     (ptr1),y
     cmp     #$FF ; EOF reached ?
     beq     @exit
@@ -87,12 +87,16 @@
 @skipinc2:
 
 
-    iny
+    ;iny
     jsr     @compute_offset
     ldy     #$00
     jmp     @restart
 
 @exit:
+
+    lda     #$00
+    sta     loader_from_search_key
+
     lda     index_software
     sta     index_software_ptr
 

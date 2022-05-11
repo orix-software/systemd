@@ -56,7 +56,7 @@
     jsr     exit_interface_confirmed
     print   str_oom
     rts
-    
+
 @not_oom_for_ptr4:
     sta     index_software
 
@@ -71,7 +71,7 @@
     sta     id_current_software+1
 
     ; compute ptr1 with the header
-    
+
     ; Init ptr with the first entry
 
     lda     ptr1
@@ -85,7 +85,7 @@
     ldy     #$00
     lda     ptr1
     sta     (index_software_ptr),y
-    
+
     iny
     lda     ptr1+1
     sta     (index_software_ptr),y
@@ -274,13 +274,13 @@
 @S13:
     sta     ptr3
 
-@L20:  
+@L20:
 
     iny
     lda     (ptr1),y
 
     beq     @end_of_software_line
-    
+
     bne     @L20
 
 @end_of_software_line:

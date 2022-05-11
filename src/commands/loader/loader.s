@@ -81,6 +81,11 @@ tmp1                := userzp+18 ; ptr compute
     jmp     exit_interface_confirmed
 
 @demo_menu:
+
+    lda     #$00
+    sta     loader_from_search_key
+    sta     software_index_ptr_compute_from_search
+
     lda     #$00
     sta     software_menu_id
 
