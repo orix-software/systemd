@@ -45,8 +45,6 @@
     lda     #$00 ; end
     sta     basic11_name_tape_file,y
 
-@me:
-    jmp     @me
 
     ; Looking for next ; it's software name now
     iny ; Skip ;
@@ -119,6 +117,7 @@
     mfree   (ptr2)
 
     jsr     exit_interface_confirmed
+
 
     lda     #<BUFEDT
     ldy     #>BUFEDT
