@@ -6,10 +6,10 @@
 
     lda     #' '
     ldy     #$00
-@loop:    
+@loop:
     sta     (TR5),y
     iny
-    cpy     #39
+    cpy     #10
     bne     @loop
 
     rts

@@ -1,15 +1,17 @@
 .export _loader
 
-.define LOADER_COLOR_BAR                $11
-.define LOADER_CONF_SEPARATOR           ';'
-.define LOADER_MAX_SIZE_DB_SIZE         25000
-.define LOADER_FIRST_POSITION_BAR       $bb80+7*40+1
-.define LOADER_LAST_LINE_MENU_ITEM      18
-.define LOADER_MAX_SOFTWARE_BY_CATEGORY 2000
-.define LOADER_LAST_LINE                $bb80+24*40+1
-.define LOADER_MAX_LENGTH_SOFTWARE_NAME 35
+.define LOADER_COLOR_BAR                      $11
+.define LOADER_CONF_SEPARATOR                 ';'
+.define LOADER_MAX_SIZE_DB_SIZE               25000
+.define LOADER_FIRST_POSITION_BAR             $bb80+7*40+1
+.define LOADER_LAST_LINE_MENU_ITEM            18
+.define LOADER_MAX_SOFTWARE_BY_CATEGORY       2000
+.define LOADER_LAST_LINE                      $bb80+24*40+1
+.define LOADER_MAX_LENGTH_SOFTWARE_NAME       35
 .define LOADER_POS_INF_NUMBER                 $bb80+27*40
 .define LOADER_FIRST_BYTE_OFFSET_AFTER_HEADER $02
+.define LOADER_POSITION_FOR_VERSION_DISPLAY   $bb80+27*40+33
+
 
 ; Number of malloc here :
 ; Routine loaded to load systemd.rom
@@ -35,8 +37,6 @@ tmp1                := userzp+18 ; ptr compute
 
 .proc _loader
     cli
-
-
 
     lda     #$00
     sta     pos_menu_loader_x
@@ -67,6 +67,16 @@ tmp1                := userzp+18 ; ptr compute
 
 @start_menu_bank:
     jsr     twil_interface_clear_menu
+    ; Display version
+    ldy     #$00
+@L1:
+    lda     version,y
+    beq     @out
+    sta     LOADER_POSITION_FOR_VERSION_DISPLAY,y
+    iny
+    bne     @L1
+@out:
+
     jsr     _start_twilmenubank
     cmp     #$01 ; Error does not clear screen
     beq     @exit_loader
@@ -488,6 +498,7 @@ tmp1                := userzp+18 ; ptr compute
     beq     @out33
     cpx     #LOADER_MAX_LENGTH_SOFTWARE_NAME
     beq     @exit_diplay
+    ;cpy
     sta     LOADER_LAST_LINE+1,x
     inx
 
@@ -646,3 +657,4 @@ loader_from_search_key:
 .include "_loader_clear_bottom_text.s"
 .include "loader_search_by_keysearch.s"
 .include "display_list.s"
+.include "loader_display_informations.s"

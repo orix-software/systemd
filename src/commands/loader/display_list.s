@@ -176,6 +176,10 @@
 @out:
     rts
 
+@display_information:
+    jsr     loader_display_informations
+    jmp     @wait_keyboard
+
 @start_nav:
     lda     #LOADER_COLOR_BAR
     jsr     loader_display_bar
@@ -215,6 +219,10 @@
     beq     @go_up
     cmp     #13
     beq     @go_enter
+
+    cmp     #32
+    beq     @display_information
+
 
     jsr     loader_search_by_keysearch
     cmp     #$00
@@ -256,6 +264,8 @@
     ldx     reached_bottom_of_screen
     cpx     #LOADER_LAST_LINE_MENU_ITEM
     beq     @no_display_software
+    cpy     #LOADER_MAX_LENGTH_SOFTWARE_NAME ; FIXME
+    bcs     @no_display_software
 
     sta     (ptr3),y
 @no_display_software:
@@ -395,4 +405,3 @@
 @exit_up:
     jmp     @wait_keyboard
 .endproc
-

@@ -65,6 +65,7 @@ BANK_LABEL=($BB80+40*7+2)
     pla
     rts
 
+
 @checkkey:
     cmp     #TWIL_KEYBOARD_ESC
     beq     @exit
@@ -77,6 +78,9 @@ BANK_LABEL=($BB80+40*7+2)
     beq     @go_down
     cmp     #11
     beq     @go_up
+
+
+
     jmp     @read_keyboard
 
 
@@ -93,8 +97,6 @@ BANK_LABEL=($BB80+40*7+2)
     ; FIXME PATH
     jsr     load_bank_routine_menu_bank
 
-
-
     lda     #$01 ; Error
     jmp     @exit
 
@@ -105,8 +107,6 @@ BANK_LABEL=($BB80+40*7+2)
     adc     #$01
     cmp     number_of_roms_in_banks_cnf
     beq     @read_keyboard
-
-
 
     lda     pos_y_on_screen
     cmp     #17
