@@ -421,6 +421,10 @@ run:
     stx     fd_systemd+1
 
     mfree(ptr1)
+    ; Return fp
+    lda     fd_systemd
+    ldx     fd_systemd+1
+
     rts
 .endproc
 

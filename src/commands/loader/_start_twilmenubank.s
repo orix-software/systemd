@@ -371,7 +371,7 @@ run:
     bne      @found
     cmp      #$FF
     bne      @found
-     jsr      _missing_file
+    jsr      _missing_file
     print    path_banks
     lda      #' '
     BRK_KERNEL XWR0
@@ -382,6 +382,7 @@ run:
     rts
 @found:
     ; Save FP
+
     sta     fp_banks_cnf
     stx     fp_banks_cnf+1
 
@@ -414,6 +415,8 @@ run:
     bne      @read_success
     mfree    (buffer)
     fclose   (fd_systemd)
+    lda      #$00
+    jsr      exit_interface_confirmed
     print    str_nothing_to_read
     rts
 
