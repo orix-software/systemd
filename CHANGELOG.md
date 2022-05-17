@@ -1,6 +1,7 @@
 # 2022.3
 
 * we can search by letter
+* display the version of loader at the bottom of the screen
 
 # 2022.1.3
 

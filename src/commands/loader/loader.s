@@ -11,7 +11,13 @@
 .define LOADER_POS_INF_NUMBER                 $bb80+27*40
 .define LOADER_FIRST_BYTE_OFFSET_AFTER_HEADER $02
 .define LOADER_POSITION_FOR_VERSION_DISPLAY   $bb80+27*40+33
+.define LOADER_POSITION_START_INFORMATION_ATTRIBUTE     $bb80+7*40    ; The first line where information is displayed
+.define LOADER_POSITION_START_INFORMATION     LOADER_POSITION_START_INFORMATION_ATTRIBUTE+2    ; The first line where information is displayed
 
+CH376_GET_FILE_SIZE   = $0C
+
+.define LOADER_MAX_LINE_FOR_INFORMATION_TEXT  18
+.define LOADER_NUMBER_OF_BYTE_FOR_SCROLLING_AND_INFORMATION_TEXT LOADER_FIRST_POSITION_BAR-$bb80+18*40+39
 
 ; Number of malloc here :
 ; Routine loaded to load systemd.rom
@@ -42,6 +48,7 @@ tmp1                := userzp+18 ; ptr compute
     sta     pos_menu_loader_x
     sta     software_menu_id
     sta     software_index_ptr_compute_from_search
+    sta     loader_from_search_key
 
     ldx     #$01 ; Loader banner
     jsr     twil_interface_init
@@ -133,6 +140,10 @@ tmp1                := userzp+18 ; ptr compute
     lda     #$01
     sta     software_menu_id
 
+    lda     #$00
+    sta     loader_from_search_key
+    sta     software_index_ptr_compute_from_search
+
     lda     #$04
     sta     twil_interface_current_menu
 
@@ -148,9 +159,7 @@ tmp1                := userzp+18 ; ptr compute
     beq     @check_left_game
 
     cmp     #TWIL_KEYBOARD_ESC
-
     beq     @exit_loader
-
 
     inc     twil_interface_current_menu
     jmp     @tools_menu
@@ -164,16 +173,17 @@ tmp1                := userzp+18 ; ptr compute
 
     jmp     @demo_menu
 
-
 @tools_menu:
+    lda     #$00
+    sta     loader_from_search_key
+    sta     software_index_ptr_compute_from_search
+
     lda     #$02
     sta     software_menu_id
     lda     #$03
     sta     twil_interface_current_menu
     lda     #$01
     jsr     twil_interface_change_menu
-
-
 
     jsr     twil_interface_clear_menu
     jsr     @display_menu_loader_software
@@ -192,18 +202,19 @@ tmp1                := userzp+18 ; ptr compute
     lda     #$00
     jsr     twil_interface_change_menu
 
-
     jmp     @game_menu
 
 @music_menu:
+    lda     #$00
+    sta     loader_from_search_key
+    sta     software_index_ptr_compute_from_search
+
     lda     #$03
     sta     software_menu_id
     lda     #$05
     sta     twil_interface_current_menu
     lda     #$01
     jsr     twil_interface_change_menu
-
-
 
     jsr     twil_interface_clear_menu
     jsr     @display_menu_loader_software
@@ -335,6 +346,7 @@ tmp1                := userzp+18 ; ptr compute
     jsr     exit_interface_confirmed
 
     print   (ptr2)
+    print   #' '
     print   str_not_found
     mfree   (ptr2)
     BRK_KERNEL XCRLF
@@ -348,7 +360,28 @@ tmp1                := userzp+18 ; ptr compute
 
     mfree   (ptr2)
 
-    malloc  #LOADER_MAX_SIZE_DB_SIZE,ptr2 ; 20000 bytes
+
+
+    ; Get size of tje fome
+    lda     #CH376_GET_FILE_SIZE
+    sta     CH376_COMMAND
+    lda     #$68
+    sta     CH376_DATA
+    ; store file length
+
+    lda     CH376_DATA
+    sta     @filesize
+
+    ldy     CH376_DATA
+    sty     @filesize+1
+
+    ; and drop others (max 64KB of file)
+    ldx     CH376_DATA
+    ldx     CH376_DATA
+
+
+    BRK_KERNEL XMALLOC
+    ;malloc  #LOADER_MAX_SIZE_DB_SIZE,ptr2 ; 20000 bytes
     cmp     #$00
     bne     @not_oom_file_content
     cpy     #$00
@@ -359,9 +392,17 @@ tmp1                := userzp+18 ; ptr compute
     print   str_oom
     rts
 
-@not_oom_file_content:
+@filesize:
+    .res 2
 
-    fread (ptr2), LOADER_MAX_SIZE_DB_SIZE, 1, fp_file_menu
+@not_oom_file_content:
+    sta     ptr2
+    sty     ptr2+1
+
+    fread (ptr2), @filesize, 1, fp_file_menu
+;    fread (ptr2), LOADER_MAX_SIZE_DB_SIZE, 1, fp_file_menu
+
+
     fclose(fp_file_menu)
 
 
@@ -410,7 +451,6 @@ tmp1                := userzp+18 ; ptr compute
 
     lda     #'/'
     sta     LOADER_POS_INF_NUMBER+3
-
 
     lda     #<(LOADER_POS_INF_NUMBER+4)
     sta     TR5

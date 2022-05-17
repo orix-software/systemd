@@ -32,6 +32,10 @@
     ptr1                       := userzp+20
     next_bank                  := userzp+22
     loader_tmp1                := userzp+22
+    ptr5                       := userzp+24
+    ptr6                       := userzp+26
+    ptr7                       := userzp+28
+    ptr8                       := userzp+30
 
 .macro  BRK_KERNEL   value
         .byte $00,value

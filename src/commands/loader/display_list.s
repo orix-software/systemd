@@ -27,6 +27,8 @@
 
     ; Get the number if the softare
     ldy     #LOADER_FIRST_BYTE_OFFSET_AFTER_HEADER ; First byte is the version, second byte and third are the number of software
+;@me:
+  ;  jmp     @me
     lda     (ptr1),y
     sta     nb_of_software+1
     tax     ; save High for malloc
@@ -39,11 +41,17 @@
     bcc     @do_not_inc_x
     inx
 @do_not_inc_x:
-    ; At this step we have the number of software*2
+    ; At this step we have the number of software*2 for only the first byte
     ; Swap X and Y
 
-    stx     loader_tmp1
-    ldy     loader_tmp1
+    pha
+    txa
+    asl
+    tay
+    pla
+
+
+
     ; Now malloc
 
 
@@ -58,7 +66,9 @@
     rts
 
 @not_oom_for_ptr4:
-    sta     index_software
+
+
+    sta     index_software  ;5041
 
     sty     index_software+1
 
@@ -91,7 +101,6 @@
     sta     (index_software_ptr),y
 
 
-
    ; Inc +2
     inc     index_software_ptr
     bne     @skipinc3
@@ -110,6 +119,8 @@
 
 
 .proc start_display
+
+
 @init_Y:
 
 
@@ -181,6 +192,13 @@
     jmp     @wait_keyboard
 
 @start_nav:
+    ; $55FF 784 bytes
+    ;jsr     exit_interface_confirmed
+    ;jsr     _debug_lsmem
+
+;@me:
+    ;jmp     @me
+
     lda     #LOADER_COLOR_BAR
     jsr     loader_display_bar
 
@@ -229,6 +247,8 @@
     bne     @wait_keyboard
 
     jmp     start_display
+
+
 
 @exit_listing:
     rts
@@ -324,7 +344,7 @@
     lda     #LOADER_COLOR_BAR
     jsr     loader_display_bar
 
-
+; 70e9
 ; Inc +2
     lda     index_software_ptr
     bne     @skipinc1_up

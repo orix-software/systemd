@@ -12,7 +12,6 @@
 
     ; Looking for mode index_software_ptr
 
-
     ; Search first ; and get tape file
     ldy     #$00
     lda     (index_software_ptr),y
@@ -115,12 +114,13 @@
 
     mfree   (index_software)
     mfree   (ptr2)
-
+    lda     #$00
     jsr     exit_interface_confirmed
 
 
     lda     #<BUFEDT
     ldy     #>BUFEDT
+
     BRK_KERNEL XEXEC
 
 
@@ -190,4 +190,3 @@ debug_cmd:
 debug_cmd:
     .asciiz "lsmem"
 .endproc
-

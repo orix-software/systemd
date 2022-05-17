@@ -26,10 +26,20 @@
 
     sta     tmp1 ; Save the key pressed
 
+
+
     lda     #$00
     sta     @compute_number_of_software
     lda     #$00
     sta     @compute_number_of_software+1
+
+
+
+    lda     index_software_ptr
+    sta     @save_index_software_ptr
+
+    lda     index_software_ptr+1
+    sta     @save_index_software_ptr+1
 
     lda     index_software
     sta     index_software_ptr
@@ -49,6 +59,7 @@
 
     iny
 @L1:
+
     lda     (ptr1),y
     cmp     #$FF ; EOF reached ?
     beq     @exit
@@ -70,11 +81,14 @@
     cmp     #$FF
     beq     @exit
     bne     @search_0
+
 @next_software_reached:
     inc     @compute_number_of_software
     bne     @skip_inc_high
     inc     @compute_number_of_software+1
+
 @skip_inc_high:
+
    ; Inc +2
     inc     index_software_ptr
     bne     @skipinc1
@@ -86,8 +100,22 @@
     inc     index_software_ptr+1
 @skipinc2:
 
+    lda     index_software_ptr+1
+    cmp     #$53
+    bne     @ho
+    lda     index_software_ptr
+    cmp     #$51
+    bne     @ho
+  ;  @me2:
+   ;     jmp @me2
 
-    ;iny
+@ho:
+
+
+
+    iny
+
+
     jsr     @compute_offset
     ldy     #$00
     jmp     @restart
@@ -96,12 +124,24 @@
 
     lda     #$00
     sta     loader_from_search_key
+    lda     #$00
+    sta     software_index_ptr_compute_from_search
 
-    lda     index_software
+    lda     #$01
+    sta     reached_bottom_of_screen
+
+
+    lda     @save_index_software_ptr
     sta     index_software_ptr
 
-    lda     index_software+1
+    lda     @save_index_software_ptr+1
     sta     index_software_ptr+1
+
+    lda     ptr2
+    sta     ptr1
+
+    lda     ptr2+1
+    sta     ptr1+1
 
     lda     #$01 ; Not founds
     rts
@@ -124,7 +164,6 @@
     iny
     lda     ptr1+1
 
-
     lda     #$00
     sta     reached_bottom_of_screen
 
@@ -145,10 +184,16 @@
     lda     #$01
     sta     software_index_ptr_compute_from_search
 
+;@me:
+    ;jmp     @me
+;lda     index_software_ptr
+
+
     lda     #$00 ; Found
     rts
 
 @compute_offset:
+
     tya
     clc
     adc     ptr1
@@ -157,5 +202,6 @@
 @do_not_inc:
     sta     ptr1
     rts
+@save_index_software_ptr:
+    .res 2
 .endproc
-
