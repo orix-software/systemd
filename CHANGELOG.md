@@ -2,6 +2,7 @@
 
 * we can search by letter
 * display the version of loader at the bottom of the screen
+* if we press space www.oric.org informations are displayed (and comments)
 
 # 2022.1.3
 
