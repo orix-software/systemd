@@ -3,6 +3,7 @@
 .include   "../dependencies/orix-sdk/macros/SDK_print.mac"
 .include   "../dependencies/orix-sdk/macros/SDK_memory.mac"
 .include   "../dependencies/orix-sdk/macros/SDK_file.mac"
+.include   "../dependencies/orix-sdk/macros/SDK_conio.mac"
 
 .include   "../libs/usr/arch/include/twil.inc"
 
@@ -16,8 +17,6 @@
 
     userzp := $80+30
 
-    
-
     fd_systemd                 := userzp
     buffer                     := userzp+2
     ; Don't use userzp+4 !!! It's a malloc for return routine in twilbank of shell command (when funct + T and funct +L are pressed)
@@ -29,11 +28,14 @@
     save_twil_register_banking := userzp+13
     bank_register              := userzp+14
     current_bank               := userzp+15
-    
     ptr4                       := userzp+18
     ptr1                       := userzp+20
     next_bank                  := userzp+22
     loader_tmp1                := userzp+22
+    ptr5                       := userzp+24
+    ptr6                       := userzp+26
+    ptr7                       := userzp+28
+    ptr8                       := userzp+30
 
 .macro  BRK_KERNEL   value
         .byte $00,value
@@ -59,14 +61,14 @@ _systemd:
     lda     #34 ; Init to bank 33
     sta     next_bank
 
-    print   str_starting,NOSAVE
-    print   version,NOSAVE
-    print   systemd_starting,NOSAVE
+    print   str_starting
+    print   version
+    print   systemd_starting
 
     print   str_reading_banks
 
     jsr     read_banks
-    
+
     rts
 .endproc
 
@@ -81,15 +83,15 @@ _systemd:
 
     lda      #<path_banks
     ldy      #>path_banks
-  
+
     jsr      open_file
 
-    cpx      #$ff 
+    cpx      #$ff
     bne      @found
-    cmp      #$ff 
+    cmp      #$ff
     bne      @found
-    print    path_banks,NOSAVE
-    print    str_not_found,NOSAVE
+    print    path_banks
+    print    str_not_found
     rts
 @found:
     ; fd_systemd is stored in open_file
@@ -98,7 +100,7 @@ _systemd:
     bne      @continue
     cmp      #$00
     bne      @continue
-   
+
     rts
 
 @continue:
@@ -113,7 +115,7 @@ _systemd:
     ldy      #>1000
 
 	BRK_KERNEL XFREAD
-    
+
     lda      PTR_READ_DEST+1
     sec
     sbc      ptr3+1
@@ -128,7 +130,7 @@ _systemd:
     cpx      #$10
     bne      @read_success
     mfree    (buffer)
-    fclose   (fd_systemd)    
+    fclose   (fd_systemd)
     print    str_nothing_to_read
     rts
 
@@ -149,14 +151,12 @@ _systemd:
     jsr      load_bank_routine
     jmp      @again
 
-
- 
-no_path:    
-    print   str_failed,NOSAVE
+no_path:
+    print   str_failed
 
 no_chars:
-    print str_done,NOSAVE
-    
+    print str_done
+
     rts
 .endproc
 
@@ -167,15 +167,15 @@ no_chars:
     cmp     #$FF
     bne     @read ; not null then  start because we did not found a conf
 
-    print   str_failed_word,NOSAVE
-    BRK_KERNEL XCRLF 
-    print   str_error_path_not_found,NOSAVE
-    print   (buffer),NOSAVE
-    BRK_KERNEL XCRLF
-  ;  mfree (ptr1)     
-    
+    print   str_failed_word
+    crlf
+    print   str_error_path_not_found
+    print   (buffer)
+    crlf
+  ;  mfree (ptr1)
+
     rts
-    
+
 @read:
     sta     fd_systemd    ; Store fd
     stx     fd_systemd+1
@@ -184,7 +184,7 @@ no_chars:
     malloc   16896,ptr2,str_oom ; Malloc for the routine to copy into memory, but also the 16KB of the bank to load
     lda      ptr2  ;
     sta      ptr4
-    
+
     ldy      ptr2+1
 
     iny
@@ -199,10 +199,8 @@ no_chars:
 
     fclose(fd_systemd)
 
-
-
     ldy     #$00
-@loop:    
+@loop:
     lda     twil_copy_buffer_to_ram_bank,y
     sta     (ptr2),y
     iny
@@ -223,9 +221,8 @@ no_chars:
 
     jsr     run
     mfree(ptr2)
-    print str_OK,NOSAVE
-    BRK_KERNEL XCRLF
-    
+    print str_OK
+    crlf
     ; Checking if all banks are full
     ldx     next_bank
     inx
@@ -244,7 +241,7 @@ run:
 .define MAX_LINE_SIZE_INI 100
 .proc read_inifile_section
     ldy      #$00
-@L1:    
+@L1:
     lda      (buffer),y
     cmp      #'['
     beq      @out
@@ -284,30 +281,30 @@ run:
     rts
 
     lda      #' '
-    BRK_KERNEL XWR0 
+    BRK_KERNEL XWR0
 
     ldy      #$00
-@L2:    
+@L2:
     lda      (buffer),y
-  
+
     cmp      #$0D
-    beq      @out4       
+    beq      @out4
     cmp      #$0A
     beq      @out4
-     ;BRK_KERNEL XWR0 
+     ;BRK_KERNEL XWR0
     iny
     bne      @L2
-@out4:    
+@out4:
     lda      #$00
-    sta      (buffer),y       
+    sta      (buffer),y
     rts
-   
+
 .endproc
 
 .proc read_inifile_path
     ldx      #$00
     ldy      #$00
-@L1:    
+@L1:
     lda      (buffer),y
     cmp      str_token_path,x
     beq      @out
@@ -325,7 +322,7 @@ run:
     lda     #$01
     rts
 @ok:
-    iny  
+    iny
     tya
     clc
     adc      buffer
@@ -333,24 +330,24 @@ run:
     inc      buffer+1
 @S5:
     sta      buffer
-    
+
     ;now store 0 at the end of the path
     ldy      #$00
-@L6:    
+@L6:
     lda      (buffer),y
     cmp      #$0A
     beq      @out4
     cmp      #$0D
-    beq      @out4     
+    beq      @out4
     iny
     bne      @L6
     lda      #$01
     rts
 
 @out4:
-        
 
-    lda      #$00    
+
+    lda      #$00
     sta      (buffer),y
     rts
 
@@ -365,14 +362,14 @@ run:
     jsr      open_file
     cpx      #$FF
     bne      @found
-    cmp      #$FF 
+    cmp      #$FF
     bne      @found
-    print   path_modules,NOSAVE
-    print   str_not_found,NOSAVE
+    print   path_modules
+    print   str_not_found
     rts
-@found:    
+@found:
     fclose (fd_systemd)
-    
+
 
     ;path_modules
     rts
@@ -395,20 +392,19 @@ run:
     sta     ptr1
     sty     ptr1+1
 
-    
 
     ldy  #$00
-@loop4:    
+@loop4:
 @filename:
     lda     (ptr2),y
     beq     @out
     sta     (ptr1),y
     iny
     bne     @loop4
-    
+
 @out:
     sta     (ptr1),y
-    
+
 
 
     fopen (ptr1), O_RDONLY
@@ -417,9 +413,9 @@ run:
     bne     @read ; not null then  start because we did not found a conf
     cmp     #$FF
     bne     @read ; not null then  start because we did not found a conf
-    print   str_failed,NOSAVE
+    print   str_failed
 
-    
+
     mfree(ptr1)
     ldx     #$ff
     txa
@@ -427,8 +423,12 @@ run:
 @read:
     sta     fd_systemd
     stx     fd_systemd+1
-    
+
     mfree(ptr1)
+    ; Return fp
+    lda     fd_systemd
+    ldx     fd_systemd+1
+
     rts
 .endproc
 
@@ -451,7 +451,7 @@ run:
     and     #%11111000
     ora     current_bank_systemd
     sta     VIA2::PRA
-    
+
 
     lda     sector_to_update_systemd ; pour debug FIXME, cela devrait être à 4
     sta  	TWILIGHTE_BANKING_REGISTER
@@ -464,7 +464,7 @@ run:
 
     ldx     #$00
     ldy     #$00
-@loop:    
+@loop:
     lda     (ptr4),y
     sta     (ptr3),y
     iny
@@ -508,7 +508,7 @@ run:
     rts
 @bank0:
     ; Impossible to have bank 0
-    tax    
+    tax
     rts
 set:
     .byte 0,0,0,0,0,4,4,4
@@ -519,7 +519,7 @@ set:
     .byte 0,0,0,0,0,1,1,1
     .byte 1,2,2,2,2,3,3,3
     .byte 3,4,4,4,4,5,5,5
-    .byte 5,6,6,6,6,7,7,7,7    
+    .byte 5,6,6,6,6,7,7,7,7
 
 bank:
     .byte 1,1,2,3,4,5,6,7
@@ -538,14 +538,14 @@ bank:
 command0_str:
        .ASCIIZ "twiconf"
 command1_str:
-       .ASCIIZ "twiload"       
+       .ASCIIZ "twiload"
 ;.ASCIIZ "systemd"
 ;command1_str:
 
 commands_text:
 commands_address:
     .addr _start_twilfirmware
-    .addr _loader    
+    .addr _loader
 commands_version:
         .ASCIIZ "0.0.1"
 
@@ -566,8 +566,8 @@ parse_vector:
         .byt $00,$00
 ; fff3
 adress_commands:
-        .addr commands_address   
-; fff5        
+        .addr commands_address
+; fff5
 list_commands:
         .addr command0_str
 ; $fff7
@@ -578,7 +578,7 @@ signature_address:
 
 ; ----------------------------------------------------------------------------
 ; Version + ROM Type
-ROMDEF: 
+ROMDEF:
         .addr systemd_start
 
 ; ----------------------------------------------------------------------------

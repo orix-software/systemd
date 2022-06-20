@@ -3,13 +3,14 @@
 
 .define LOADER_LAUNCH_BASIC11_TAPE_FILE 'A'
 .define LOADER_LAUNCH_BASIC10_TAPE_FILE 'O'
+.define LOADER_LAUNCH_FTDOS_DISK_FILE   'J'
+.define LOADER_LAUNCH_ORIX_BIN_FILE     'Z'
+.define LOADER_LAUNCH_SEDORIC_FILE      'S'
 
-XEXEC = $63
 
 .proc _loader_launch_software
 
     ; Looking for mode index_software_ptr
-
 
     ; Search first ; and get tape file
     ldy     #$00
@@ -34,7 +35,7 @@ XEXEC = $63
     cmp     #';'
     beq     @end_tape_file
     cmp     #'.'
-    beq     @end_tape_file    
+    beq     @end_tape_file
     sta     basic11_name_tape_file,y
     iny
     bne     @L2
@@ -42,6 +43,7 @@ XEXEC = $63
 @end_tape_file:
     lda     #$00 ; end
     sta     basic11_name_tape_file,y
+
 
     ; Looking for next ; it's software name now
     iny ; Skip ;
@@ -67,8 +69,6 @@ XEXEC = $63
 
 
 @get_flag:
-
-
     lda     $dead,y
     cmp     #LOADER_LAUNCH_BASIC11_TAPE_FILE
     beq     @start_basic11_tape_file
@@ -80,7 +80,7 @@ XEXEC = $63
 @start_basic10_tape_file:
 
     ldy     #$00
-@L300:    
+@L300:
     lda     basic10_exec_command,y
     sta     basic11_exec_command,y
     iny
@@ -89,10 +89,10 @@ XEXEC = $63
 
     beq     @start_command
 
-@start_basic11_tape_file:    
+@start_basic11_tape_file:
 
     ldy     #$00
-@L301:    
+@L301:
     lda     basic11_exec_command,y
     sta     basic11_exec_command,y
     iny
@@ -101,10 +101,6 @@ XEXEC = $63
 
 
 @start_command:
-
-
-
-
 
     ldy     #$00
 @L1:
@@ -118,11 +114,13 @@ XEXEC = $63
 
     mfree   (index_software)
     mfree   (ptr2)
-    
+    lda     #$00
     jsr     exit_interface_confirmed
+
 
     lda     #<BUFEDT
     ldy     #>BUFEDT
+
     BRK_KERNEL XEXEC
 
 
@@ -141,19 +139,18 @@ XEXEC = $63
     BRK_KERNEL XEXEC
 
 
-    
     lda     $200
     cmp     #ENOMEM
     beq     @print_oom
     rts
 @print_oom:
     jsr     exit_interface_confirmed
-    print   loader_biname,NOSAVE
+    print   loader_biname
     lda     #':'
     BRK_KERNEL XWR0
     print   str_oom
-    BRK_KERNEL XCRLF
-    rts    
+    crlf
+    rts
 
 
 basic11_exec_command:
@@ -164,7 +161,8 @@ basic11_name_tape_file:
 
 basic10_exec_command:
     .asciiz "basic10"
-
+ftdos_exec_command:
+    .asciiz "ftdos"
 loader_biname:
     .asciiz "Loader"
 
@@ -190,5 +188,5 @@ debug_cmd:
     BRK_KERNEL XEXEC
     rts
 debug_cmd:
-    .asciiz "lsmem"    
-.endproc    
+    .asciiz "lsmem"
+.endproc

@@ -24,7 +24,7 @@ BANK_LABEL=($BB80+40*7+2)
 
     lda     #<BANK_LABEL
     sta     ptr4
-    
+
     lda     #<(BANK_LABEL-1)
     sta     @__store_bar+1
 
@@ -33,7 +33,7 @@ BANK_LABEL=($BB80+40*7+2)
 
     lda     #>(BANK_LABEL-1)
     sta     @__store_bar+2
-    
+
 
     lda     #$00
     sta     number_of_roms_in_banks_cnf
@@ -50,8 +50,7 @@ BANK_LABEL=($BB80+40*7+2)
 
     jsr     @display_bar
 
-
-    jsr     debug_loader_rom 
+    jsr     debug_loader_rom
 
     jsr     seek_label_next
 
@@ -66,6 +65,7 @@ BANK_LABEL=($BB80+40*7+2)
     pla
     rts
 
+
 @checkkey:
     cmp     #TWIL_KEYBOARD_ESC
     beq     @exit
@@ -78,8 +78,11 @@ BANK_LABEL=($BB80+40*7+2)
     beq     @go_down
     cmp     #11
     beq     @go_up
+
+
+
     jmp     @read_keyboard
-  
+
 
 
 @go_enter:
@@ -90,15 +93,13 @@ BANK_LABEL=($BB80+40*7+2)
     lda     ptr_current_path+1
     sta     ptr1+1
 
-    
+
     ; FIXME PATH
     jsr     load_bank_routine_menu_bank
 
-
-
     lda     #$01 ; Error
     jmp     @exit
-    
+
 
 @go_down:
     lda     pos_y_bar
@@ -107,17 +108,15 @@ BANK_LABEL=($BB80+40*7+2)
     cmp     number_of_roms_in_banks_cnf
     beq     @read_keyboard
 
-
-
     lda     pos_y_on_screen
     cmp     #17
-    
+
     bne     @continue_go_down
 
     jsr     @erase_bar
 
     jsr     doscrollupinframe
-   ; jsr     @display_bar
+
 
     jsr     seek_label_next
 
@@ -141,21 +140,21 @@ BANK_LABEL=($BB80+40*7+2)
     bne     @loop300
 @continue_down_check:
     inc     pos_y_bar
-   ; jsr     debug_loader_rom 
+
 
     jsr     @display_bar_and_display_infos
     jmp     @read_keyboard
 
 @continue_go_down:
-   
+
     jsr     seek_label_next
     inc     pos_y_on_screen
     jsr     @erase_bar
 
-@do_not_erase_bar:   
+@do_not_erase_bar:
     inc     pos_y_bar
     lda     @__store_bar+1
-    clc     
+    clc
     adc     #$28
     bcc     @S_DOWN
     inc     @__store_bar+2
@@ -163,20 +162,11 @@ BANK_LABEL=($BB80+40*7+2)
     sta     @__store_bar+1
 
     jsr     @display_bar_and_display_infos
-    ;jsr     @display_bar
-    ;jsr     debug_loader_rom
-
-    ;lda     #$00
-    ;sta     go_up
 
     jmp     @read_keyboard
 
 @go_up:
-    ;lda     go_up
-    ;bne     @do_not_update
-    ;inc     go_up
-  ;  jsr     seek_label_before
-   ; jsr     seek_label_before
+
 
 @do_not_update:
 
@@ -188,7 +178,7 @@ BANK_LABEL=($BB80+40*7+2)
 
 
     lda     @__store_bar+1
-    sec     
+    sec
     sbc     #$28
     bcs     @S_UP
     dec     @__store_bar+2
@@ -196,9 +186,9 @@ BANK_LABEL=($BB80+40*7+2)
     sta     @__store_bar+1
 
     jsr     @display_bar
-    jsr     debug_loader_rom 
+    jsr     debug_loader_rom
     jsr     seek_label_before
-@do_not_go_up:       
+@do_not_go_up:
     jmp     @read_keyboard
 
 @check_if_first_rom:
@@ -209,7 +199,7 @@ BANK_LABEL=($BB80+40*7+2)
     jsr     @erase_bar
 
     jsr     doscrolldowninframe
-    
+
     jsr     seek_label_before
 
 
@@ -235,10 +225,7 @@ BANK_LABEL=($BB80+40*7+2)
 @continue_up_check:
     dec     pos_y_bar
     jsr     @display_bar_and_display_infos
-    ;jsr     debug_loader_rom
 
-
-  ;  jmp     @read_keyboard
 
 @no_scroll_up:
     jmp     @read_keyboard
@@ -248,16 +235,16 @@ BANK_LABEL=($BB80+40*7+2)
 @display_bar:
     lda     #BANK_BAR_COLOR
     bne     @__store_bar
-@erase_bar:    
+@erase_bar:
     lda     #' '
     bne     @__store_bar
-@__store_bar:    
+@__store_bar:
     sta     BANK_LABEL-1
     rts
 
 @display_bar_and_display_infos:
     jsr     @display_bar
-    jsr     debug_loader_rom 
+    jsr     debug_loader_rom
     rts
 .endproc
 
@@ -268,15 +255,15 @@ BANK_LABEL=($BB80+40*7+2)
     cmp     #$FF
     bne     @read ; not null then  start because we did not found a conf
     jsr     _missing_file
-    print   str_failed_word,NOSAVE
-    BRK_KERNEL XCRLF 
-    print   str_error_path_not_found,NOSAVE
-    print   (ptr1),NOSAVE
-    BRK_KERNEL XCRLF
+    print   str_failed_word
+    crlf
+    print   str_error_path_not_found
+    print   (ptr1)
+    crlf
 
     lda     #$01 ; Error
     rts
-    
+
 @read:
     sta     fd_systemd
     stx     fd_systemd+1
@@ -288,7 +275,7 @@ BANK_LABEL=($BB80+40*7+2)
     lda     ptr2  ;
     sta     ptr4
     sta     PTR_READ_DEST
-    
+
     ldy     ptr2+1
 
     iny
@@ -299,19 +286,19 @@ BANK_LABEL=($BB80+40*7+2)
     ; We read the file with the correct
 
 
-    fread (PTR_READ_DEST), 16384, 1, fd_systemd 
+    fread (PTR_READ_DEST), 16384, 1, fd_systemd
 
     ; copy the routine
 
     fclose(fd_systemd)
 
     ldy     #$00
-@loop:    
+@loop:
     lda     bank_twil_copy_buffer_to_ram_bank,y
     sta     (ptr2),y
     iny
     bne     @loop
-    
+
     ; We set dest ptr (ROM)
     lda     #$C0
     sta     ptr3+1
@@ -335,7 +322,7 @@ run:
     ; Copy ROM loaded into bank 0
     ldx     #$00
     ldy     #$00
-@loop:    
+@loop:
     lda     (ptr4),y
     sta     (ptr3),y
     iny
@@ -377,24 +364,25 @@ run:
 
     lda      #<path_banks
     ldy      #>path_banks
-  
+
     jsr      open_file
 
-    cpx      #$FF 
+    cpx      #$FF
     bne      @found
-    cmp      #$FF 
+    cmp      #$FF
     bne      @found
-     jsr      _missing_file
-    print    path_banks,NOSAVE
+    jsr      _missing_file
+    print    path_banks
     lda      #' '
     BRK_KERNEL XWR0
-    print    str_not_found,NOSAVE
-    BRK_KERNEL XCRLF
+    print    str_not_found
+    crlf
     lda      #$FF
     tax
     rts
 @found:
     ; Save FP
+
     sta     fp_banks_cnf
     stx     fp_banks_cnf+1
 
@@ -411,7 +399,7 @@ run:
 @continue:
     sta      buffer
     sta      buffer_bkp
-    sta      ptr3 
+    sta      ptr3
     sty      buffer+1
     sty      buffer_bkp+1
     sty      ptr3+1
@@ -423,10 +411,12 @@ run:
     ; Do we read 0 bytes ?
     cmp      #$00
     bne      @read_success
-    cpx      #$00           ; 
+    cpx      #$00           ;
     bne      @read_success
     mfree    (buffer)
-    fclose   (fd_systemd)    
+    fclose   (fd_systemd)
+    lda      #$00
+    jsr      exit_interface_confirmed
     print    str_nothing_to_read
     rts
 
@@ -439,9 +429,9 @@ run:
     sbc      ptr3+1
     sta      ptr3+1
 
-    
+
     lda      PTR_READ_DEST ; 7E
- 
+
     sec
     sbc      ptr3
     bcs      @nodecX
@@ -461,7 +451,7 @@ run:
     lda      buffer
     clc
     adc      ptr3
-    
+
     bcc      @skip_inc
     inc      ptr3+1
 @skip_inc:
@@ -485,18 +475,11 @@ run:
     ; ptr_current_label contains the first entry of banks.cnf
     lda      buffer_bkp
     sta      ptr_current_label
-    
+
     lda      buffer_bkp+1
     sta      ptr_current_label+1
-    
-
 
     jsr      seek_path
-
-
-
-
-
 
     jsr      read_inifile_section_bank_launcher
     cmp      #$01
@@ -506,12 +489,10 @@ run:
     cmp      #$01
     beq      no_path
     ; Path found, then open
-    
+
     jmp      @again
 
-
- 
-no_path:   
+no_path:
 
 
 no_chars:
@@ -527,25 +508,24 @@ no_chars:
     lda      ptr_current_label+1
     sta      ptr_current_path+1
     sta      RES+1
-    
 
     ; Looking for =
     ldy      #$00
-@loop200:    
+@loop200:
     lda      (RES),y
     cmp      #'='
     beq      @exit
     iny
     bne      @loop200
-@exit:    
-    ; = found 
+@exit:
+    ; = found
     iny
     tya
     clc
     adc      ptr_current_path
     bcc      @skip_inc_200
     inc      ptr_current_path+1
-@skip_inc_200:    
+@skip_inc_200:
     sta      ptr_current_path
 
     rts
@@ -556,29 +536,27 @@ no_chars:
     sta      RES
     lda      ptr_current_label+1
     sta      RES+1
-    
+
 
     ; Looking for =
     ldy      #$01
-@loop200:    
+@loop200:
     lda      (RES),y
     cmp      #'['
-    beq      @found      
+    beq      @found
     iny
     bne      @loop200
-@found:    
-    ; = found 
+@found:
+    ; = found
     iny
     tya
     clc
     adc      ptr_current_label
     bcc      @skip_inc_200
     inc      ptr_current_label+1
-@skip_inc_200:    
+@skip_inc_200:
     sta      ptr_current_label
     jsr      seek_path
-
-
 
     rts
 .endproc
@@ -588,34 +566,33 @@ no_chars:
 
     lda      ptr_current_label+1
     sta      RES+1
-    
 
     lda      ptr_current_label
     sec
     sbc      #$02
     bcs      @do_not_dec
     dec      RES+1
-@do_not_dec:    
+@do_not_dec:
     sta      RES
 
     ; Looking for =
     ldy      #$00
-@loop200:    
+@loop200:
     lda      (RES),y
     cmp      #'['
     beq      @found
     dec      RES
-    bne      @skip      
+    bne      @skip
     dec      RES+1
-@skip:    
+@skip:
     bne      @loop200
-@found:    
+@found:
     ; = found
 
     lda     RES+1
     sta     ptr_current_label+1
 
-    lda     RES 
+    lda     RES
     clc
     adc     #$01
     bcc     @skip2
@@ -633,7 +610,7 @@ no_chars:
 
 
     ldy      #$00
-@L1:    
+@L1:
     lda      (buffer),y
     cmp      #'['
     beq      @out
@@ -645,10 +622,9 @@ no_chars:
     jmp      @continue
     cmp      #$0A
     bne      @continue
-    ; error 
-    
+    ; error
 
-@continue:    
+@continue:
     iny
     cpy      #MENU_ROM_LAUNCH_MAX_LINEZIZE
     bne      @L1
@@ -674,14 +650,13 @@ no_chars:
 
     txa
     tay
-   
-    
+
     lda      skip_display
     bne      @skip_display_label
 
     lda      saveA
     sta      (ptr4),y       ; Store to screen
-@skip_display_label:    
+@skip_display_label:
     ldy      saveY
 
     inx
@@ -719,7 +694,6 @@ no_chars:
     sta      skip_display
     bne      @exit_manage_display
 
-    
 @skip_bottom_page:
     inc      nb_of_max_pos_y
 
@@ -730,20 +704,20 @@ no_chars:
     rts
 
     ldy      #$00
-@L2:    
+@L2:
     lda      (buffer),y
-  
+
     cmp      #$0D
-    beq      @out4       
+    beq      @out4
     cmp      #$0A
     beq      @out4
 
 
     iny
     bne      @L2
-@out4:    
+@out4:
     lda      #$00
-    sta      (buffer),y       
+    sta      (buffer),y
     rts
 
 .endproc
@@ -752,10 +726,10 @@ no_chars:
 
     ldx      #$00
     ldy      #$00
-@L1:    
+@L1:
     lda      (buffer),y
 
-    cmp      #'=' ; We reach '=' It means that it's rom 
+    cmp      #'=' ; We reach '=' It means that it's rom
     beq      @path_found
     iny
     cpy      #MENU_ROM_LAUNCH_MAX_LINEZIZE
@@ -769,7 +743,7 @@ no_chars:
     lda     #$01
     rts
 @path_found:
-    iny  
+    iny
     tya
     clc
     adc      buffer
@@ -781,12 +755,12 @@ no_chars:
 
     ;now store 0 at the end of the path
     ldy      #$00
-@L6:    
+@L6:
     lda      (buffer),y
     cmp      #$0A
     beq      @out4
     cmp      #$0D
-    beq      @out4     
+    beq      @out4
     iny
     bne      @L6
 
@@ -795,11 +769,10 @@ no_chars:
 
 @out4:
 
-    lda      #$00    
+    lda      #$00
     sta      (buffer),y
 
     rts
-
 
 .endproc
 
@@ -816,18 +789,17 @@ no_chars:
 
     ldx     #$01
     ldy     #$00
-    
+
     lda     pos_y_bar
     clc
     adc     #$01
     bcc     @S1
     iny
-@S1:    
+@S1:
     BRK_KERNEL XBINDX
 
     lda     #'/'
     sta     LOADER_POS_INF_NUMBER+3
-
 
     lda     #<(LOADER_POS_INF_NUMBER+4)
     sta     TR5
@@ -840,7 +812,7 @@ no_chars:
     ldx     #$01
     ldy     number_of_roms_in_banks_cnf+1
     lda     number_of_roms_in_banks_cnf
-    BRK_KERNEL XBINDX    
+    BRK_KERNEL XBINDX
     rts
 .endproc
 
@@ -852,14 +824,14 @@ saveX:
     .res     1
 saveA:
     .res     1
-pos_y_bar: 
+pos_y_bar:
     .res     1
 pos_y_on_screen:
     .res     1
 fp_banks_cnf:
     .res     2
 buffer_bkp:
-    .res     2  
+    .res     2
 skip_display:
     .byte    0
 nb_of_max_pos_y:
