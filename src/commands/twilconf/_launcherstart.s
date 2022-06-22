@@ -44,7 +44,7 @@ XGETARGV = $2E
 	BRK_KERNEL XTEXT  ; and text
 	BRK_KERNEL XSCRNE
     rts
-.endproc 
+.endproc
 
 .macro PRINT str
 	pha

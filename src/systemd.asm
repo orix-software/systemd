@@ -277,7 +277,6 @@ run:
     sta      buffer
 
     lda      #$00
-    ;sta      current_section
     rts
 
     lda      #' '
@@ -291,7 +290,6 @@ run:
     beq      @out4
     cmp      #$0A
     beq      @out4
-     ;BRK_KERNEL XWR0
     iny
     bne      @L2
 @out4:

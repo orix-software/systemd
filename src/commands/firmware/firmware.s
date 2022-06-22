@@ -1,7 +1,7 @@
 .include "../dependencies/ds1501-lib/src/include/ds1501.s"
 
 ; 24 secs de retard le 11/01
-.define TWIL_ICON_GAME               $03 
+.define TWIL_ICON_GAME               $03
 .define TWIL_ICON_DEMO               $04
 .define TWIL_ICON_TOOLS              $05
 .define TWIL_ICON_MUSIC              $06
@@ -12,8 +12,8 @@
 .define TWIL_ICON_ENGRENAGE_FIRMWARE $0D
 .define TWIL_ICON_MUSIC_LOADER       $0E
 
-.define TWIL_ON_ICON           $00
-.define TWIL_OFF_ICON          $01
+.define TWIL_ON_ICON                 $00
+.define TWIL_OFF_ICON                $01
 
 .define TWIL_INC_LOADED  twil_inc_loaded
 
@@ -38,8 +38,7 @@
 
 
 .include "../common/keyboard.inc"
-.define TWIL_FIRMWARE_WITH_RTC    $03
-
+.define TWIL_FIRMWARE_WITH_ETHERNET $03
 
 
 .define TWIL_ACTION_EXIT_FIRM3    $05
@@ -84,7 +83,7 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
 
     lda     $342 ; Get version
     and     #TWIL_MASK_REGISTER_VERSION
-    cmp     #TWIL_FIRMWARE_WITH_RTC
+    cmp     #TWIL_FIRMWARE_WITH_ETHERNET
     beq     @version4
     ; Firm 2
     lda     #TWILFIRM_MAX_MENU_ENTRY_FIRM_2
@@ -152,33 +151,33 @@ read_keyboard:
 go_left_twilfirm:
     ldx     twil_interface_current_menu
     beq     @exit_go_left_twilfirm
-    
+
     jsr     twil_interface_clear_menu
-    
+
     dec     twil_interface_current_menu
 
     jsr     twilfirm_menu_management
     cmp     #$01
     bne     @exit_go_left_twilfirm
         ; restore chars
-     
+
 
     rts
 @exit_go_left_twilfirm:
 
     lda     #TWIL_ON_ICON
-    jsr     twil_interface_change_menu    
+    jsr     twil_interface_change_menu
 
     jmp     read_keyboard
-.endproc    
+.endproc
 
 
 .proc   twilfirm_menu_management
-    
+
 
     lda     $342 ; Get version
     and     #%00000011
-    cmp     #TWIL_FIRMWARE_WITH_RTC
+    cmp     #TWIL_FIRMWARE_WITH_ETHERNET
     beq     @version4
 
     lda     twil_interface_current_menu         ; Get current menu 
@@ -192,12 +191,12 @@ go_left_twilfirm:
     rts
 
 
-@memory_menu:    
-    jmp     _twil_displays_banks    
+@memory_menu:
+    jmp     _twil_displays_banks
 
 @upgrade_menu:
-    rts    
-@version4:    
+    rts
+@version4:
     lda     twil_interface_current_menu         ; Get current menu 
     beq     @display_menu_infos
     cmp     #TWIL_ACTION_MEMORY_MENU
@@ -410,10 +409,10 @@ string_high:
     .byte   >str_would_you_like_to_exit
     .byte   >str_ip_addr
     .byte   >str_twilighte_battery
-    .byte   >str_twilighte_battery_level    
+    .byte   >str_twilighte_battery_level
     .byte   >str_twilighte_date
     .byte   >str_twilighte_low              ; 10
-    .byte   >str_twilighte_full             ; 11    
+    .byte   >str_twilighte_full             ; 11
     .byte   >str_usb_controller_firmware    ; 12
     .byte   >str_twilighte_time             ; 13
 
@@ -439,14 +438,14 @@ pos_string_high:
     .byte   >($BB80+40*9+2)
     .byte   >($BB80+40*8+2)
     .byte   >($BB80+40*11+2)
-    .byte   >($BB80+40*14+2) ; RTC
-    .byte   >($BB80+40*7+2)  ; Exit
-    .byte   >($BB80+40*7+2)  ; Firmware
-    .byte   >($BB80+40*12+2) ; on board battery
-    .byte   >($BB80+40*13+2) ; Battery level
-    .byte   >($BB80+40*7+2)  ; Date
+    .byte   >($BB80+40*14+2)  ; RTC
+    .byte   >($BB80+40*7+2)   ; Exit
+    .byte   >($BB80+40*7+2)   ; Firmware
+    .byte   >($BB80+40*12+2)  ; on board battery
+    .byte   >($BB80+40*13+2)  ; Battery level
+    .byte   >($BB80+40*7+2)   ; Date
     .byte   >($BB80+40*13+25) ; State battery low
-    .byte   >($BB80+40*13+25)  ; state battery full
+    .byte   >($BB80+40*13+25) ; state battery full
     .byte   >($BB80+40*10+2)  ; usb version
     .byte   >($BB80+40*7+2)   ; Time
 
@@ -455,7 +454,7 @@ pos_string_high:
     .byt    $1A             ; .byte $1A ; nop on nmos, "inc A" every cmos
     cmp     #$01
     bne     @is6502Nmos
-.p816    
+.p816
     ; is it 65c816
     xba                     ; .byte $EB, put $01 in B accu (nop on 65C02/65SC02)
     dec     a               ; .byte $3A, A=$00

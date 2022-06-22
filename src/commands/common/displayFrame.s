@@ -3,25 +3,27 @@
 ;userzp := $80
 ;ptr2 := userzp+2
 
-POS_LEFT_UP_CORNER:=($A000+(47*40))
 
-POS_LEFT_DOWN_CORNER:=($A000+(194*40))
 
 FRAME_NUMBER_LINE=2
 
-TWIL_INTERFACE_FIRST_LINE_TEXT:=$BB80+40*7
-TWIL_INTERFACE_LAST_LINE_TEXT:=$BB80+40*25
+POS_LEFT_UP_CORNER                    :=($A000+(47*40))
+POS_LEFT_DOWN_CORNER                  :=($A000+(194*40))
+TWIL_INTERFACE_FIRST_LINE_TEXT        :=$BB80+40*7
+TWIL_INTERFACE_LAST_LINE_TEXT         :=$BB80+40*25
 TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
 
-.define FRAME_HORIZONTAL_BAR_CHAR 94
-.define FRAME_VERTICAL_BAR_CHAR   96
+.define FRAME_HORIZONTAL_BAR_CHAR  94
+.define FRAME_VERTICAL_BAR_CHAR    96
+.define FRAME_DOWN_LEFT_BAR_CHAR   '{'
+.define FRAME_DOWN_RIGHT_BAR_CHAR  '}'
 
 .proc _displayFrame
     lda     #<POS_LEFT_UP_CORNER
     sta     userzp
     lda     #>POS_LEFT_UP_CORNER
     sta     userzp+1
-    
+
     lda     #<POS_LEFT_DOWN_CORNER
     sta     ptr2
     lda     #>POS_LEFT_DOWN_CORNER
@@ -29,8 +31,8 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
 
 ; horizontal bar
     ldx     #$00
-@draw_next_line:    
-    ldy     #$01    
+@draw_next_line:
+    ldy     #$01
 @L11:
     lda     horizontal_bar,x
     sta     (userzp),y
@@ -73,15 +75,14 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
 
     ldx     #$00
 @L10:
-    ldy     #$00    
+    ldy     #$00
     lda     up_left,x
     sta     (userzp),y
-   
- 
+
 
     ldy     #39
     lda     up_right,x
-    sta     (userzp),y    
+    sta     (userzp),y
 
 
 
@@ -107,7 +108,6 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
     cpx     #$06
     bne     @L10
 
-
     ; Vertical
 
     lda     #<(POS_LEFT_UP_CORNER+6*40)
@@ -116,9 +116,9 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
     sta     userzp+1
 
     ldx     #$00
- 
+
 @draw_vertical:
-    ldy     #$00   
+    ldy     #$00
     lda     verticalBorder
     sta     (userzp),y
     ldy     #39
@@ -150,10 +150,10 @@ TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME = $11
     ldy     #39
     lda     #FRAME_VERTICAL_BAR_CHAR
     ldx     #TWIL_INTERFACE_NUMBER_LINES_FOR_FRAME
-L1:    
-__pos:    
+L1:
+__pos:
     sta     TWIL_INTERFACE_FIRST_LINE_TEXT
-__pos2:    
+__pos2:
     sta     TWIL_INTERFACE_FIRST_LINE_TEXT,y
 
 
@@ -170,29 +170,39 @@ __pos2:
     pla
     dex
     bpl     L1
-; Display last line   
+; Display last line
 
-    lda     #'{'
+    lda     #FRAME_DOWN_LEFT_BAR_CHAR
     sta     TWIL_INTERFACE_LAST_LINE_TEXT
-    
-    lda     #'}'
+
+    lda     #FRAME_DOWN_RIGHT_BAR_CHAR
     sta     TWIL_INTERFACE_LAST_LINE_TEXT+39
 
     ldx     #$00
-@L200:    
+@L200:
+    lda     46080+8*FRAME_HORIZONTAL_BAR_CHAR,x
+    sta     backup_FRAME_HORIZONTAL_BAR_CHAR,x
+
+    lda     46080+8*FRAME_DOWN_LEFT_BAR_CHAR,x
+    sta     backup_FRAME_DOWN_LEFT_BAR_CHAR,x
+
+    lda     46080+8*FRAME_DOWN_RIGHT_BAR_CHAR,x
+    sta     backup_FRAME_DOWN_RIGHT_BAR_CHAR,x
+
+
     lda     horizontal_bar,x
     sta     46080+8*FRAME_HORIZONTAL_BAR_CHAR,x
     lda     down_left,x
-    sta     46080+8*'{',x
+    sta     46080+8*FRAME_DOWN_LEFT_BAR_CHAR,x
     lda     down_right,x
-    sta     46080+8*'}',x    
+    sta     46080+8*FRAME_DOWN_RIGHT_BAR_CHAR,x
     inx
     cpx     #$08
     bne     @L200
 
     ldx     #$00
     lda     #FRAME_HORIZONTAL_BAR_CHAR ; ^
-@L100:    
+@L100:
     sta     TWIL_INTERFACE_LAST_LINE_TEXT+1,x
     inx
     cpx     #38
@@ -208,7 +218,7 @@ down_left:
     .byt $4F
     .byt $43
     .byt 64 ; Not used except for redef char
-    .byt 64 ; Not used except for redef char    
+    .byt 64 ; Not used except for redef char
 
 up_left:
     .byte $43,$4f,$5c,$58,$70,$71
@@ -240,3 +250,31 @@ down_right:
 
 verticalBorder:
 .byte  115
+
+.proc _loader_restore_charset
+    ldx     #$00
+@L200:
+    ; save
+
+    lda     backup_FRAME_HORIZONTAL_BAR_CHAR,x
+    sta     46080+8*FRAME_HORIZONTAL_BAR_CHAR,x
+
+    lda     backup_FRAME_DOWN_LEFT_BAR_CHAR,x
+    sta     46080+8*FRAME_DOWN_LEFT_BAR_CHAR,x
+
+    lda     backup_FRAME_DOWN_RIGHT_BAR_CHAR,x
+    sta     46080+8*FRAME_DOWN_RIGHT_BAR_CHAR,x
+
+    inx
+    cpx     #$08
+    bne     @L200
+    rts
+.endproc
+
+backup_FRAME_HORIZONTAL_BAR_CHAR:
+    .res 8
+backup_FRAME_DOWN_LEFT_BAR_CHAR:
+    .res 8
+backup_FRAME_DOWN_RIGHT_BAR_CHAR:
+    .res 8
+

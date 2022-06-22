@@ -400,8 +400,6 @@ tmp1                := userzp+18 ; ptr compute
     sty     ptr2+1
 
     fread (ptr2), @filesize, 1, fp_file_menu
-;    fread (ptr2), LOADER_MAX_SIZE_DB_SIZE, 1, fp_file_menu
-
 
     fclose(fp_file_menu)
 
@@ -411,7 +409,6 @@ tmp1                := userzp+18 ; ptr compute
 
     mfree(index_software)
     mfree(ptr2)
-;    jsr     _debug_lsmem
 
     pla
     rts
@@ -424,6 +421,7 @@ tmp1                := userzp+18 ; ptr compute
 	BRK_KERNEL XTEXT  ; and text
 	BRK_KERNEL XSCRNE
 @out:
+    jsr     _loader_restore_charset
     rts
 .endproc
 

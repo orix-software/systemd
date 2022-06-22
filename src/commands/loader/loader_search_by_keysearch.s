@@ -7,7 +7,7 @@
     cmp     #'z'+1 ; 'z'
     bcs     @check_numbers
     ; a to Z are pressed
-    ; Switch to uppercase and seartch
+    ; Switch to uppercase and search
     sbc     #$1F
     jmp     @search
 
