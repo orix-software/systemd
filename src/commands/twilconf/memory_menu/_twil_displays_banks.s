@@ -1,16 +1,16 @@
     TRUE = 0
     FALSE = 1
  
-    save_bank                       := userzp+1	; 1 byte
-    save_twilighte_register         := userzp+2 ; 1 bytes
-    save_twilighte_banking_register := userzp+3 ; 1 bytes
-    bank_decimal_current_bank       := userzp+4 ; 1 byte
-    ptr_routine_bank                := userzp+5 ; 2 bytes
-    current_bank_tmp                := userzp+7
-    ptr_display                     := userzp+9
-    ptr_signature                   := userzp+11
-    is_a_valid_rom                  := userzp+13
-    switch_to_rom                   := userzp+14
+    save_bank                       := userzp+15	; 1 byte
+    save_twilighte_register         := userzp+1 ; 1 bytes
+    save_twilighte_banking_register := userzp ; 1 bytes
+    bank_decimal_current_bank       := userzp+29 ; 1 byte
+    ptr_routine_bank                := userzp+31 ; 2 bytes
+    current_bank_tmp                := userzp+21 ; 1 byte
+    ptr_display                     := userzp+22   ; 2 bytes
+    ptr_signature                   := userzp+24 ; 2 bytes
+    is_a_valid_rom                  := userzp+26 ; 1 byte
+    switch_to_rom                   := userzp+27 ; 1 byte
 
 .proc _twil_displays_banks
 
@@ -20,7 +20,7 @@
 
     lda      #<($bb80+7*40+2)
     sta      ptr_display
-  
+
     lda      #>($bb80+7*40+2)
     sta      ptr_display+1
 
@@ -30,7 +30,7 @@
     sta     __read_rom_info+1
     sta     __copy+1
     sta     __copy2+1
-    
+
     lda     ptr_routine_bank+1
     sta     __read_rom_info+2
     sta     __copy+2
@@ -38,17 +38,17 @@
     inc     __copy2+2
 
     ldy      #$00
-loop:    
+loop:
     lda      routine_display_signature_into_ram,y
-__copy:    
+__copy:
     sta      $dead,y
     lda      routine_display_signature_into_ram+256,y
-__copy2:    
-    sta      $dead,y    
+__copy2:
+    sta      $dead,y
     iny
     bne      loop
 
-	
+
     lda     #64
     sta     bank_decimal_current_bank
 
@@ -60,7 +60,7 @@ __copy2:
     lda     TWILIGHTE_REGISTER
     sta     save_twilighte_register
 
-    
+
     lda     #FALSE
     sta     is_a_valid_rom
 restart:
@@ -70,12 +70,12 @@ restart:
     dec     bank_decimal_current_bank
     lda     bank_decimal_current_bank
 __read_rom_info:
-    jsr     $dead 
-    lda     bank_decimal_current_bank   
+    jsr     $dead
+    lda     bank_decimal_current_bank
     cmp     #$01
     beq     @finished
     dec     bank_decimal_current_bank
-    
+
     lda     is_a_valid_rom
     cmp     #FALSE
     beq     restart
@@ -84,18 +84,19 @@ __read_rom_info:
     clc
     adc     #$28
     bcc     @no_inc
-    inc     ptr_display+1   
+    inc     ptr_display+1
 @no_inc:
-    sta     ptr_display  
-    
+    sta     ptr_display
+
     lda     #FALSE
     sta     is_a_valid_rom
 
     jmp     restart
-       
-@finished:  
 
-   ; mfree (ptr_routine_bank)
+@finished:
+
+    mfree (ptr_routine_bank)
+
     lda     #$00
 
     rts
@@ -121,7 +122,7 @@ __read_rom_info:
     bne     @display_signature
 @rom:
     lda     TWILIGHTE_REGISTER
- 
+
     and     #%11011111
     sta     TWILIGHTE_REGISTER
 
@@ -137,12 +138,12 @@ __read_rom_info:
 
     lda     $FFF0 ; empty rom ?
     beq     @out
-    ; check if orix ROM ? 
+    ; check if orix ROM ?
     lda     $FFFE
     cmp     #$FA
     bne     @out
 
-    
+
     lda     $FFF8
     sta     ptr_signature
     lda     $FFF9
@@ -155,7 +156,7 @@ __read_rom_info:
 
     ldy     #$00
 @loop:
-   
+
     lda     (ptr_signature),y
     beq     @out
     cmp     #' '                        ; 'a'
@@ -164,13 +165,13 @@ __read_rom_info:
     bcs     @none_char
 
     sta     (ptr_display),y
-@none_char:    
+@none_char:
     iny
     cpy     #30
     bne     @loop
 
-@no_signature:    
-@out:    
+@no_signature:
+@out:
 
     lda     save_bank
     sta     VIA2::PRA
