@@ -362,8 +362,8 @@ run:
 
 .proc read_banks_bank_launcher
 
-    lda      #<path_banks
-    ldy      #>path_banks
+    lda      #<path_banks_loader
+    ldy      #>path_banks_loader
 
     jsr      open_file
 
@@ -842,4 +842,5 @@ ptr_current_path:
     .res     2
 go_up:
     .res     1
-
+path_banks_loader:
+    .asciiz "/etc/systemd/banks.cnf"

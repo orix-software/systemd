@@ -192,12 +192,6 @@
     jmp     @wait_keyboard
 
 @start_nav:
-    ; $55FF 784 bytes
-    ;jsr     exit_interface_confirmed
-    ;jsr     _debug_lsmem
-
-;@me:
-    ;jmp     @me
 
     lda     #LOADER_COLOR_BAR
     jsr     loader_display_bar
@@ -344,8 +338,7 @@
     lda     #LOADER_COLOR_BAR
     jsr     loader_display_bar
 
-; 70e9
-; Inc +2
+
     lda     index_software_ptr
     bne     @skipinc1_up
     dec     index_software_ptr+1

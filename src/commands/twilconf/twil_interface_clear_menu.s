@@ -9,13 +9,13 @@
 
     ldy     #$01
     ldx     #17
-    
 
-L1: 
-    lda     #32   
 
-    ldy     #$01  
-__pos:    
+L1:
+    lda     #32
+
+    ldy     #$01
+__pos:
     sta     $A000,y
     iny
     cpy     #TWIL_NUMBER_OF_CHAR_TO_CLEAR_IN_A_LINE
@@ -36,7 +36,7 @@ __pos:
 value_on:
     .res    1
 value_off:
-    .res    1    
+    .res    1
 
 
 .endproc
