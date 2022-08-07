@@ -14,13 +14,13 @@ fi
 
 ld65 -tnone  tmp/systemd.ld65 -o systemd.rom -Ln tmp/systemd.sym -m tmp/memmap.txt -vm
 
-
 mkdir -p $ORICUTRON_PATH/sdcard/usr/share/systemd
 cp systemd.rom $ORICUTRON_PATH/sdcard/usr/share/systemd
+
 #echo cp systemd.rom $ORICUTRON_PATH/sdcard/usr/share/systemd
 cp systemd.rom $ORICUTRON_PATH/roms
 mkdir $ORICUTRON_PATH/sdcard/etc/systemd
-
+cp etc/systemd/roms.cnf $ORICUTRON_PATH/sdcard/etc/systemd/
 cd $ORICUTRON_PATH
 ./oricutron
 cd -

@@ -4,6 +4,11 @@
 .include   "../dependencies/orix-sdk/macros/SDK_memory.mac"
 .include   "../dependencies/orix-sdk/macros/SDK_file.mac"
 .include   "../dependencies/orix-sdk/macros/SDK_conio.mac"
+.include   "../dependencies/orix-sdk/macros/case.mac"
+
+.include   "../dependencies/orix-sdk/include/keyboard.inc"
+
+.define MAX_LINE_SIZE_INI 100
 
 .include   "../libs/usr/arch/include/twil.inc"
 
@@ -46,26 +51,21 @@
 .code
 ; Entry point
 ; $c000
-    jmp     systemd_start
+    jmp     systemd_cold
 ; $c003
     jmp     _start_twilfirmware
 ; $c006
-
     jmp     _loader
-   ; jmp     $c006 ; for dbug
-_systemd:
+; $c009
+    jmp     systemd_hot
 
+.proc       systemd_hot
+    rts
+.endproc
 
-.proc systemd_start
-
+.proc systemd_cold
     lda     #34 ; Init to bank 33
     sta     next_bank
-
-    print   str_starting
-    print   version
-    print   systemd_starting
-
-    print   str_reading_banks
 
     jsr     read_banks
 
@@ -77,12 +77,14 @@ _systemd:
 .include "commands/loader/loader.s"
 .include "commands/loader/_start_twilmenubank.s"
 .include "strings.asm"
+.include "config.s"
 
 
 .proc read_banks
 
     lda      #<path_banks
     ldy      #>path_banks
+
 
     jsr      open_file
 
@@ -111,57 +113,58 @@ _systemd:
 	sty      PTR_READ_DEST+1
     sty      ptr3+1 ; for compute
 
-	lda      #<1000
-    ldy      #>1000
 
-	BRK_KERNEL XFREAD
+    fread   (buffer),1000,1,fd_systemd
+	;lda      #<1000
+;    ldy      #>1000
 
-    lda      PTR_READ_DEST+1
-    sec
-    sbc      ptr3+1
-    tax
-    lda      PTR_READ_DEST
-    sec
-    sbc      ptr3
+;	BRK_KERNEL XFREAD
+
+ ;   lda      PTR_READ_DEST+1
+  ;  sec
+   ; sbc      ptr3+1
+;    tax
+    ;lda      PTR_READ_DEST
+    ;sec
+    ;sbc      ptr3
 
 
-    cmp      #$00
-    bne      @read_success
-    cpx      #$10
-    bne      @read_success
-    mfree    (buffer)
-    fclose   (fd_systemd)
-    print    str_nothing_to_read
-    rts
+    ;cmp      #$00
+    ;bne      @read_success
+    ;cpx      #$10
+    ;bne      @read_success
+    ;mfree    (buffer)
+    ;fclose   (fd_systemd)
+    ;print    str_nothing_to_read
+    ;rts
 
 @read_success:
 
     fclose (fd_systemd)
 @again:
-    print     str_bank
-
-
     jsr      read_inifile_section
+
     cmp      #$01
     beq      no_chars
     jsr      read_inifile_path
     cmp      #$01
     beq      no_path
     ; Path found, then open
+
     jsr      load_bank_routine
     jmp      @again
 
 no_path:
-    print   str_failed
+    print    str_failed
 
 no_chars:
-    print str_done
+    ;print str_done
 
     rts
 .endproc
 
 .proc load_bank_routine
-    fopen  (buffer), O_RDONLY
+    fopen  (buffer), O_RDONLY,,fd_systemd
     cpx     #$FF
     bne     @read ; not null then  start because we did not found a conf
     cmp     #$FF
@@ -177,11 +180,10 @@ no_chars:
     rts
 
 @read:
-    sta     fd_systemd    ; Store fd
-    stx     fd_systemd+1
 
     ;Malloc 512 for routine + buffer 16384
     malloc   16896,ptr2,str_oom ; Malloc for the routine to copy into memory, but also the 16KB of the bank to load
+
     lda      ptr2  ;
     sta      ptr4
 
@@ -193,7 +195,7 @@ no_chars:
     sty      ptr4+1  ; contains the content of the rom
 
 
-    fread ptr4, 16384, 1, fd_systemd
+    fread (ptr4), 16384, 1, fd_systemd
 
     ; copy the routine
 
@@ -221,7 +223,7 @@ no_chars:
 
     jsr     run
     mfree(ptr2)
-    print str_OK
+    ;print str_OK
     crlf
     ; Checking if all banks are full
     ldx     next_bank
@@ -238,8 +240,10 @@ run:
     jmp (ptr2)
 .endproc
 
-.define MAX_LINE_SIZE_INI 100
+
 .proc read_inifile_section
+
+
     ldy      #$00
 @L1:
     lda      (buffer),y
@@ -259,7 +263,7 @@ run:
     lda      (buffer),y
     cmp      #']'
     beq      @out3
-    BRK_KERNEL XWR0
+    ;BRK_KERNEL XWR0
    ; sta      current_section,x
     inx
     iny
@@ -300,6 +304,7 @@ run:
 .endproc
 
 .proc read_inifile_path
+
     ldx      #$00
     ldy      #$00
 @L1:
@@ -333,6 +338,7 @@ run:
     ldy      #$00
 @L6:
     lda      (buffer),y
+
     cmp      #$0A
     beq      @out4
     cmp      #$0D
@@ -384,7 +390,6 @@ run:
     bne      @continue
     cmp      #$00
     bne      @continue
-
     rts
 @continue:
     sta     ptr1
@@ -402,8 +407,6 @@ run:
 
 @out:
     sta     (ptr1),y
-
-
 
     fopen (ptr1), O_RDONLY
 
@@ -473,7 +476,7 @@ run:
     cpx     #64
     bne     @loop
     ; then execute
-    ;jsr     $c000
+    jsr     $c000   ; Execute
 
 @out:
 
@@ -577,12 +580,12 @@ signature_address:
 ; ----------------------------------------------------------------------------
 ; Version + ROM Type
 ROMDEF:
-        .addr systemd_start
+        .addr systemd_cold
 
 ; ----------------------------------------------------------------------------
 ; RESET
 rom_reset:
-        .addr   systemd_start
+        .addr   systemd_cold
 ; ----------------------------------------------------------------------------
 ; IRQ Vector
 empty_rom_irq_vector:

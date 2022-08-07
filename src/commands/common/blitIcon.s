@@ -19,13 +19,13 @@ ptr_pos_img_dest := userzp+2 ; 2
     lda     icons_list_pos_low,x
     sta     ptr_pos_img_dest
     lda     icons_list_pos_high,x
-    sta     ptr_pos_img_dest+1    
+    sta     ptr_pos_img_dest+1
 
 
     ldx     #$00
 @next_line:
     ldy     #$00
-@L1:    
+@L1:
     lda     (ptr_pos_img_src),y
     sta     (ptr_pos_img_dest),y
     iny
@@ -63,7 +63,7 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+7)    
     .byte <($a000+POSY_ICON*40+13)
     .byte <($a000+POSY_ICON*40+13) ; Game
-    .byte <($a000+POSY_ICON*40+7)    
+    .byte <($a000+POSY_ICON*40+7)
     .byte <($a000+POSY_ICON*40+19) ; Tools
     .byte <($a000+POSY_ICON*40+20)
     .byte <($a000+POSY_ICON*40+13)  ; Exit firm 2
@@ -72,24 +72,24 @@ icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+13) ; clock (firm3)
     .byte <($a000+POSY_ICON*40+1)  ; Rom for loader
     .byte <($a000+POSY_ICON*40+34) ; exit loader
-    .byte <($a000+POSY_ICON*40+25) ; Engrenage to fix
+    .byte <($a000+POSY_ICON*40+13) ; Engrenage to fix
     .byte <($a000+POSY_ICON*40+25) ; Music
-    
+
 icons_list_pos_high:
     .byte >($a000+POSY_ICON*40+1)  ; 0 Infos
-    .byte >($a000+POSY_ICON*40+7)  ; 1  
+    .byte >($a000+POSY_ICON*40+7)  ; 1
     .byte >($a000+POSY_ICON*40+13) ; 2
     .byte >($a000+POSY_ICON*40+13) ; 3 Game
     .byte >($a000+POSY_ICON*40+7)  ; 4 demo
     .byte >($a000+POSY_ICON*40+19) ; 5 Tools
     .byte >($a000+POSY_ICON*40+20) ; 6
-    .byte >($a000+POSY_ICON*40+13)  ; 7 Exit firm 2
+    .byte >($a000+POSY_ICON*40+19)  ; 7 Exit firm 2
     .byte >($a000+POSY_ICON*40+7)  ; 8 Network
     .byte >($a000+POSY_ICON*40+19) ; 9 Exit firm v3
     .byte >($a000+POSY_ICON*40+13) ; $0A   ; clock (firm3)
     .byte >($a000+POSY_ICON*40+1)  ; $0B Rom for launcher
     .byte >($a000+POSY_ICON*40+34) ; $0C Exit loader
-    .byte >($a000+POSY_ICON*40+25) ; $0D Engrenage to fix
+    .byte >($a000+POSY_ICON*40+13) ; $0D Engrenage to fix
     .byte >($a000+POSY_ICON*40+25) ; Music
 
 icons_list_low:

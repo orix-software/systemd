@@ -25,7 +25,7 @@ version:
     .asciiz "v2022.3.1"
 
 str_bank:
-    .asciiz "  "
+    .asciiz " DD"
 str_starting:
     .asciiz "Starting systemd "
 str_token_path:
@@ -37,7 +37,7 @@ str_nothing_to_read:
 path_modules:
     .asciiz "/etc/systemd/modules"
 path_banks:
-    .asciiz "/etc/systemd/banks.cnf"
+    .asciiz "/etc/systemd/roms.cnf"
 str_path_rom:
     .asciiz "/usr/share/systemd/systemd.rom"
 

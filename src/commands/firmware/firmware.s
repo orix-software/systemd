@@ -29,9 +29,11 @@
 .define TWIL_SWITCH_ON_ICON       $01
 
 .define TWIL_ACTION_MEMORY_MENU   $01
-.define TWIL_ACTION_UPGRADE_MENU  $02
+;.define TWIL_ACTION_CONFIG        $02
 .define TWIL_ACTION_EXIT_FIRM2    $02
-.define TWIL_ACTION_CLOCK         $02 ; Firm 3
+
+.define TWIL_ACTION_CLOCK         $0A ; TODO
+.define TWIL_ACTION_UPGRADE_MENU  $09 ; TODO
 
 .define TWIL_GEAR_ICON_ID         $0D
 
@@ -49,15 +51,14 @@
 .define TWIL_MAX_FIRMWARE_MENU_ICON 1
 
 .define TWILFIRM_MAX_MENU_ENTRY_FIRM_3 4
-.define TWILFIRM_MAX_MENU_ENTRY_FIRM_2 3 ; 0 to 3
+.define TWILFIRM_MAX_MENU_ENTRY_FIRM_2 4 ; 0 to 3
 
 
 ; Don't use userzp+4 !!! It's a malloc for return routine in twilbank of shell command (when funct + T and funct +L are pressed)
 
-pos_current_letter_charset:=userzp
-pos_text_hires:=userzp+2
-
-twilfirm_ptr2:= userzp+6
+pos_current_letter_charset:=userzp+10
+pos_text_hires:=userzp+12
+twilfirm_ptr2:= userzp+16
 
 twil_get_bank_empty_ptr1:=twilfirm_ptr2
 
@@ -66,7 +67,7 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     ldx     #$00
     jsr     twil_interface_init
 
-    jsr     twil_interface_clear_menu 
+    jsr     twil_interface_clear_menu
 
     ldx     #TWIL_INFO_ICON_ID
     jsr     _blitIcon
@@ -74,21 +75,21 @@ twil_get_bank_empty_ptr1:=twilfirm_ptr2
     ldx     #TWIL_ACTION_MEMORY_MENU
     jsr     _blitIcon
 
-    ldx     #TWIL_GEAR_ICON_ID
-    ;jsr     _blitIcon
+  ;  ldx     #TWIL_ICON_ENGRENAGE_FIRMWARE
+  ;  jsr     _blitIcon
 
     ;ldx     #TWIL_ACTION_UPGRADE_MENU
     ;jsr     _blitIcon
 
 
-    lda     $342 ; Get version
-    and     #TWIL_MASK_REGISTER_VERSION
-    cmp     #TWIL_FIRMWARE_WITH_ETHERNET
-    beq     @version4
+   ; lda     $342 ; Get version
+  ;  and     #TWIL_MASK_REGISTER_VERSION
+  ;  cmp     #TWIL_FIRMWARE_WITH_ETHERNET
+  ;  beq     @version4
     ; Firm 2
     lda     #TWILFIRM_MAX_MENU_ENTRY_FIRM_2
     sta     twil_max_menu_icon_firmware
-    
+
     ldx     #$07
     jsr     _blitIcon
     jmp     @run_menu
@@ -112,11 +113,12 @@ read_keyboard:
 
     asl     KBDCTC
     bcc     @checkkey
-@exit:    
-    ; restore chars 
+@exit:
+    ; restore chars
 	BRK_KERNEL XHIRES ; Hires
 	BRK_KERNEL XTEXT  ; and text
 	BRK_KERNEL XSCRNE
+    mfree(twilfirm_ptr2)
 
     rts
 
@@ -129,22 +131,26 @@ read_keyboard:
     cmp     #$08
     beq     go_left_twilfirm
     jmp     read_keyboard
-    
+
 @go_right:
     ldx     twil_interface_current_menu
     cpx     twil_max_menu_icon_firmware
     beq     read_keyboard
 
     jsr     twil_interface_clear_menu
-    
+
     lda     #TWIL_SWITCH_ON_ICON
     jsr     twil_interface_change_menu
-    
+
     inc     twil_interface_current_menu
 
     jsr     twilfirm_menu_management ; it return 1 if there is an action to exit
     cmp     #$01
     beq     @exit
+    cmp     #KEY_RIGHT
+    beq     @go_right
+    cmp     #KEY_LEFT
+    beq     go_left_twilfirm
     jmp     read_keyboard
 
 
@@ -157,10 +163,13 @@ go_left_twilfirm:
     dec     twil_interface_current_menu
 
     jsr     twilfirm_menu_management
+   ; cmp     #KEY_RIGHT
+   ; beq     @go_right
+   ; cmp     #KEY_LEFT
+   ; beq     go_left_twilfirm
     cmp     #$01
     bne     @exit_go_left_twilfirm
-        ; restore chars
-
+    ; restore chars
 
     rts
 @exit_go_left_twilfirm:
@@ -171,33 +180,41 @@ go_left_twilfirm:
     jmp     read_keyboard
 .endproc
 
-
 .proc   twilfirm_menu_management
 
-
     lda     $342 ; Get version
-    and     #%00000011
-    cmp     #TWIL_FIRMWARE_WITH_ETHERNET
-    beq     @version4
+    and     #%00000111
+   ; cmp     #TWIL_FIRMWARE_WITH_ETHERNET
+   ; beq     @version4
 
-    lda     twil_interface_current_menu         ; Get current menu 
+    lda     twil_interface_current_menu         ; Get current menu
     beq     @display_menu_infos
     cmp     #TWIL_ACTION_MEMORY_MENU
     beq     @memory_menu
-    ;cmp     #TWIL_ACTION_UPGRADE_MENU
-    ;beq     @upgrade_menu
+;    cmp     #TWIL_ACTION_CONFIG
+;    beq     @config_menu
     cmp     #TWIL_ACTION_EXIT_FIRM2
     beq     @exit_interface
     rts
+
+@config_menu:
+    jmp     config_menu
+
 
 
 @memory_menu:
     jmp     _twil_displays_banks
 
 @upgrade_menu:
+
+
+
+@network_interface:
+    lda     #$01
     rts
+
 @version4:
-    lda     twil_interface_current_menu         ; Get current menu 
+    lda     twil_interface_current_menu         ; Get current menu
     beq     @display_menu_infos
     cmp     #TWIL_ACTION_MEMORY_MENU
     beq     @memory_menu
@@ -206,13 +223,11 @@ go_left_twilfirm:
     cmp     #TWIL_ACTION_CLOCK
     beq     @clock_interface
     ;cmp     #TWIL_ACTION_NETWORK
-    ;beq     @network_interface    
+    ;beq     @network_interface
     cmp     #TWIL_ACTION_EXIT_FIRM3
     beq     @exit_interface
     rts
-@network_interface:
-    lda     #$01
-    rts
+
 @clock_interface:
     jsr     _twil_menu_clock
     ; Clock menu get keyboard, then this is missing here then manage here case left or right
@@ -224,23 +239,23 @@ go_left_twilfirm:
     rts
 @exit_interface_from_clock:
     jsr     twil_interface_change_menu
-    inc     twil_interface_current_menu         
+    inc     twil_interface_current_menu
     jsr     twil_interface_change_menu
 @exit_interface:
     ldx     #$05
     jsr     printToFirmDisplay
-@wait_key_for_exit:    
-    BRK_TELEMON XRDW0 
+@wait_key_for_exit:
+    BRK_TELEMON XRDW0
     cmp     #13
     beq     @exit_interface_confirmed
     cmp     #$08
-   
+
     bne     @wait_key_for_exit
     jsr     twil_interface_clear_menu
 
     lda     #$01
-    jsr     twil_interface_change_menu    
-    
+    jsr     twil_interface_change_menu
+
     dec     twil_interface_current_menu
 
     lda     #$00
@@ -248,10 +263,14 @@ go_left_twilfirm:
 
     jmp     twilfirm_menu_management
 
+@display_menu_infos:
+    jsr     twil_menu_infos
+
+    rts
 
 
-@exit_interface_confirmed:    
-    ; restore chars 
+@exit_interface_confirmed:
+    ; restore chars
 	BRK_KERNEL XHIRES ; Hires
 	BRK_KERNEL XTEXT  ; and text
 	BRK_KERNEL XSCRNE
@@ -265,17 +284,15 @@ go_left_twilfirm:
 
 @display_menu_upgrade_from_clock:
     jsr     twil_interface_change_menu
-    dec     twil_interface_current_menu         
+    dec     twil_interface_current_menu
     jsr     twil_interface_change_menu
+
 @display_menu_upgrade:
     jsr     twil_menu_upgrade
     lda     #$00
     rts
 
-@display_menu_infos:    
-    jsr     twil_menu_infos
 
-    rts
 .endproc
 
 .proc printToFirmDisplay
@@ -291,10 +308,10 @@ go_left_twilfirm:
     sta     @__modify+2
 
     ldy     #$00
-@L1:    
+@L1:
     lda     (pos_current_letter_charset),y
     beq     @out
-@__modify:    
+@__modify:
     sta     $BB80+40*7+2,y
     iny
     bne     @L1
@@ -322,13 +339,13 @@ tmp1_bank:
 str_6502:
     .asciiz "6502"
 str_65C02:
-    .asciiz "65C02"    
+    .asciiz "65C02"
 str_65C816:
-    .asciiz "65C816"    
+    .asciiz "65C816"
 str_sdcard:
-    .asciiz "SDCARD"    
+    .asciiz "SDCARD"
 str_usb:
-    .asciiz "USB"    
+    .asciiz "USB"
 
 .include "../twilconf/infos_menu/twil_menu_infos.s"
 .include "../twilconf/memory_menu/_twil_displays_banks.s"
@@ -338,6 +355,7 @@ str_usb:
 .include "../common/twil_interface_init.s"
 .include "../twilconf/twil_interface_change_menu.s"
 .include "../twilconf/twil_interface_clear_menu.s"
+.include "../twilconf/config_menu.s"
 
 
 .include "../twilconf/displayTwilighteBanner.s"
@@ -352,21 +370,21 @@ str_would_you_like_to_exit:
     .asciiz "Press enter to return to shell"
 
 str_twilighte_firmware_version:
-    .asciiz "Firmware version     : "    
+    .asciiz "Firmware version     : "
 str_default_storage:
     .asciiz "Default storage      : "
 str_usb_controller_firmware:
-    .asciiz "Usb firmware version : "    
+    .asciiz "Usb firmware version : "
 str_cpu:
     .asciiz "CPU                  : "
 str_microdisc_register:
     .asciiz "Microdisc register   : Yes"
 str_twilighte_rtc:
-    .asciiz "Real Time Clock      : Yes"    
+    .asciiz "Real Time Clock      : Yes"
 str_twilighte_battery:
-    .asciiz "On board battery     : Yes"    
+    .asciiz "On board battery     : Yes"
 str_twilighte_battery_level:
-    .asciiz "Battery level        : " 
+    .asciiz "Battery level        : "
 str_twilighte_low:
     .byt $01
     .byt  "Low"
@@ -377,19 +395,20 @@ str_twilighte_full:
 str_twilighte_date:
     .asciiz "Date : "
 str_twilighte_time:
-    .asciiz "Time : "    
-str_ip_addr:
-    .asciiz "IP : "
+    .asciiz "Time : "
+str_shell_extention_rom:
+    .asciiz "Shell extentions : "
+
 
 
 string_low:
-    .byte   <str_twilighte_firmware_version ; 0 
+    .byte   <str_twilighte_firmware_version ; 0
     .byte   <str_default_storage            ; 1
     .byte   <str_cpu                        ; 2
     .byte   <str_microdisc_register         ; 3
     .byte   <str_twilighte_rtc              ; 4
     .byte   <str_would_you_like_to_exit     ; 5
-    .byte   <str_ip_addr                    ; 6
+    .byte   <str_shell_extention_rom        ; 6
     .byte   <str_twilighte_battery          ; 7
     .byte   <str_twilighte_battery_level    ; 8
     .byte   <str_twilighte_date             ; 9
@@ -398,16 +417,14 @@ string_low:
     .byte   <str_usb_controller_firmware    ; 12
     .byte   <str_twilighte_time             ; 13
 
-        
-
 string_high:
-    .byte   >str_twilighte_firmware_version    
-    .byte   >str_default_storage    
+    .byte   >str_twilighte_firmware_version
+    .byte   >str_default_storage
     .byte   >str_cpu
-    .byte   >str_microdisc_register    
-    .byte   >str_twilighte_rtc    
+    .byte   >str_microdisc_register
+    .byte   >str_twilighte_rtc
     .byte   >str_would_you_like_to_exit
-    .byte   >str_ip_addr
+    .byte   >str_shell_extention_rom
     .byte   >str_twilighte_battery
     .byte   >str_twilighte_battery_level
     .byte   >str_twilighte_date
@@ -423,7 +440,7 @@ pos_string_low:
     .byte   <($BB80+40*11+2) ; Microdisc register
     .byte   <($BB80+40*14+2) ; RTC
     .byte   <($BB80+40*7+2)  ; Exit
-    .byte   <($BB80+40*7+2)  ; IP
+    .byte   <($BB80+40*7+2)  ; Shell extention
     .byte   <($BB80+40*12+2) ; on board battery
     .byte   <($BB80+40*13+2) ; Battery level
     .byte   <($BB80+40*7+2)  ; Date
@@ -440,7 +457,7 @@ pos_string_high:
     .byte   >($BB80+40*11+2)
     .byte   >($BB80+40*14+2)  ; RTC
     .byte   >($BB80+40*7+2)   ; Exit
-    .byte   >($BB80+40*7+2)   ; Firmware
+    .byte   >($BB80+40*7+2)   ; Shell extention
     .byte   >($BB80+40*12+2)  ; on board battery
     .byte   >($BB80+40*13+2)  ; Battery level
     .byte   >($BB80+40*7+2)   ; Date
@@ -454,6 +471,7 @@ pos_string_high:
     .byt    $1A             ; .byte $1A ; nop on nmos, "inc A" every cmos
     cmp     #$01
     bne     @is6502Nmos
+.pushcpu
 .p816
     ; is it 65c816
     xba                     ; .byte $EB, put $01 in B accu (nop on 65C02/65SC02)
@@ -462,9 +480,11 @@ pos_string_high:
     inc     a               ; .byte $1A, A=$02 if 65816/65802 and A=$01 if 65C02/65SC02
     cmp     #$02
     beq     @isA65C816
+.popcpu
     lda     #CPU_65C02       ; it's a 65C02
     rts
 @isA65C816:
+
     lda     #CPU_65816
     rts
 @is6502Nmos:

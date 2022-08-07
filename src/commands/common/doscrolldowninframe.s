@@ -5,6 +5,5 @@
     lda     #FRAME_VERTICAL_BAR_CHAR
     sta     TWIL_INTERFACE_FIRST_LINE_TEXT
     sta     TWIL_INTERFACE_FIRST_LINE_TEXT+39
-
     rts
 .endproc

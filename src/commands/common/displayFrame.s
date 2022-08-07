@@ -249,7 +249,7 @@ down_right:
 
 
 verticalBorder:
-.byte  115
+    .byte  115
 
 .proc _loader_restore_charset
     ldx     #$00
