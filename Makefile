@@ -30,7 +30,7 @@ code: $(SOURCE)
 	mkdir build/bin &&  mkdir build/usr/share/systemd/$(VERSION) -p  && cp $(PROGRAM).rom build/usr/share/systemd/$(VERSION)/$(PROGRAM).rom  && cp $(PROGRAM).rom build/usr/share/systemd/$(PROGRAM).rom 
 	$(CC) -ttelestrat src/commands/twilconf/main.c libs/lib8/twil.lib -o build/bin/twiconf
 	$(CC) -ttelestrat src/commands/loader/main.c libs/lib8/twil.lib -o build/bin/twiload
-	cp etc/systemd/roms.cnf build/etc/systemd/
+	#cp etc/systemd/roms.cnf build/etc/systemd/
 
 
 srccode: $(SOURCE)
