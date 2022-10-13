@@ -491,4 +491,3 @@ pos_string_high:
     lda     #CPU_6502
     rts
 .endproc
-
