@@ -590,4 +590,3 @@ rom_reset:
 ; IRQ Vector
 empty_rom_irq_vector:
         .addr   IRQVECTOR ; from telestrat.inc (cc65)
-

@@ -8,9 +8,3 @@ twil_interface_label_bank:
 ; Used to set the max icons depending of the firmware
 twil_max_menu_icon_firmware:
     .res 1
-
-
-
-
-
-

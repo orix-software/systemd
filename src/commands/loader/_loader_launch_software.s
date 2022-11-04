@@ -114,15 +114,16 @@
 
     mfree   (index_software)
     mfree   (ptr2)
+
     lda     #$00
     jsr     exit_interface_confirmed
 
+    ldx     #$00
 
     lda     #<BUFEDT
     ldy     #>BUFEDT
 
     BRK_KERNEL XEXEC
-
 
     ldy     #$00
 @L12:

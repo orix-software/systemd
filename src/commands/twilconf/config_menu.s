@@ -174,4 +174,3 @@ config_line_config_high:
     .byte >shell_extension_at_boot
 
 .endproc
-

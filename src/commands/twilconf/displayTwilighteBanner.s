@@ -8,7 +8,7 @@
     ; default twil_banner
     jmp     @twil_banner
 
-@loader_banner:    
+@loader_banner:
     lda     #<loader_banner
     sta     @__modify1+1
     lda     #>loader_banner
@@ -21,11 +21,11 @@
     sta     @__size1+1
     sta     @__size2+1
     jmp     @start
-@twil_banner:    
+@twil_banner:
     lda     #<twilighte_banner
     sta     @__modify1+1
     lda     #>twilighte_banner
-    sta     @__modify1+2    
+    sta     @__modify1+2
     lda     #39
     sta     @__size1+1
     sta     @__size2+1
@@ -38,25 +38,25 @@
 
 @start:
     ldy     #$00
-@L2:    
+@L2:
     ldx     #$00
 @L1:
-@__modify1:    
+@__modify1:
     lda     loader_banner,x
-@__modify2:    
-    sta     $a001,x
+@__modify2:
+    sta     $A001,x
     inx
-@__size1:    
+@__size1:
     cpx     #18 ; 39
     bne     @L1
 
     lda     @__modify1+1
     clc
-@__size2:    
+@__size2:
     adc     #18
     bcc     @S1
     inc     @__modify1+2
-@S1:    
+@S1:
     sta     @__modify1+1
 
     lda     @__modify2+1
@@ -65,7 +65,7 @@
     bcc     @S2
     inc     @__modify2+2
 @S2:
-    sta     @__modify2+1    
+    sta     @__modify2+1
 
     iny
     cpy     #16
@@ -73,8 +73,8 @@
 
 
     rts
-size:    
-    .res 1    
+size:
+    .res 1
 .endproc
 
 twilighte_banner:
