@@ -37,7 +37,4 @@ value_on:
     .res    1
 value_off:
     .res    1
-
-
 .endproc
-

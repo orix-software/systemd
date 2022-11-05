@@ -1,6 +1,6 @@
 .proc twil_interface_init
     stx     save
-    ; restore chars 
+    ; restore chars
 	BRK_KERNEL XHIRES ; Hires
 	BRK_KERNEL XTEXT  ; and text
 	BRK_KERNEL XSCRNE
@@ -20,7 +20,7 @@
 
     lda     #$07
     ldx     #$00
-@clear:    
+@clear:
     sta     $a000,x
     sta     $a000+256,x
     sta     $a000+512,x
@@ -50,6 +50,5 @@
 
     rts
 save:
-    .res 1    
+    .res    1
 .endproc
-

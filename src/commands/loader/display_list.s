@@ -27,8 +27,7 @@
 
     ; Get the number if the softare
     ldy     #LOADER_FIRST_BYTE_OFFSET_AFTER_HEADER ; First byte is the version, second byte and third are the number of software
-;@me:
-  ;  jmp     @me
+
     lda     (ptr1),y
     sta     nb_of_software+1
     tax     ; save High for malloc
@@ -50,10 +49,7 @@
     tay
     pla
 
-
-
     ; Now malloc
-
 
     BRK_KERNEL XMALLOC
     cmp     #$00
@@ -122,8 +118,6 @@
 
 
 @init_Y:
-
-
     ldy     #$00 ; First byte is the version, second byte and third are the number of software
 @loop:
     lda     (ptr1),y

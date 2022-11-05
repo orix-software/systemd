@@ -1,7 +1,5 @@
 .proc loader_display_informations
 
-
-
     malloc 50,ptr8
     cmp     #$00
     bne     @nooom

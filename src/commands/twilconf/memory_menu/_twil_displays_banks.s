@@ -1,6 +1,6 @@
     TRUE = 0
     FALSE = 1
- 
+
     save_bank                       := userzp+15	; 1 byte
     save_twilighte_register         := userzp+1 ; 1 bytes
     save_twilighte_banking_register := userzp ; 1 bytes
@@ -95,7 +95,7 @@ __read_rom_info:
 
 @finished:
 
-    mfree (ptr_routine_bank)
+    mfree   (ptr_routine_bank)
 
     lda     #$00
 

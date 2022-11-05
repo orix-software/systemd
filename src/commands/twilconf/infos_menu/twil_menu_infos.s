@@ -11,14 +11,14 @@ CH376_GET_IC_VER      = $01
     jsr     printToFirmDisplay
 
     jsr     _ch376_ic_get_ver
-    clc     
+    clc
     adc     #$30
     sta     $bb80+40*10+25
 
     ; And GET VERSION
     lda     TWILIGHTE_REGISTER ; Get version
     and     #TWIL_MASK_REGISTER_VERSION
-    clc     
+    clc
     adc     #$30
     sta     $bb80+120
 @__put_version:
@@ -35,13 +35,13 @@ CH376_GET_IC_VER      = $01
 
 
 
-    ldx     #$04            ; 
+    ldx     #$04            ;
     jsr     printToFirmDisplay
 
     ldx     #$07            ;  on board battery
     jsr     printToFirmDisplay
 
-    ldx     #$08            ; Battery level 
+    ldx     #$08            ; Battery level
     jsr     printToFirmDisplay
     ; Check battery level
 
@@ -70,17 +70,17 @@ CH376_GET_IC_VER      = $01
     stx     @__put_cpu+2
     sty     tmp1_bank
 
-    jsr     _getcpu    
+    jsr     _getcpu
     cmp     #CPU_65816
     bne     @check_6502
-    
+
     lda     #<str_65C816
     sta     @__L100+1
     lda     #>str_65C816
     sta     @__L100+2
     jmp     @display_cpu_type
 
-@check_6502:    
+@check_6502:
     cmp     #CPU_6502
     bne     @check_65C02
     lda     #<str_6502
@@ -98,7 +98,7 @@ CH376_GET_IC_VER      = $01
 @display_cpu_type:
     ldy     tmp1_bank
     ldx     #$00
-@__L100:    
+@__L100:
     lda     $dead,x
     beq     @out_cpu
 @__put_cpu:
@@ -106,24 +106,24 @@ CH376_GET_IC_VER      = $01
     inx
     iny
     bne     @__L100
-@out_cpu:    
 
+@out_cpu:
     ldx     #$01            ; Default storage
     jsr     printToFirmDisplay
     sta     @__put_device+1
     stx     @__put_device+2
     sty     tmp1_bank
 
-    ldx     #$02    ; XVARS_KERNEL_CH376_MOUNT
+    ldx     #$02            ; XVARS_KERNEL_CH376_MOUNT
     BRK_KERNEL XVARS
-    
+
     sta     @__get_default_device+1
     sty     @__get_default_device+2
 @__get_default_device:
     lda     $dead
     cmp     #$06 ; CH376_SET_USB_MODE_CODE_USB_HOST_SOF_PACKAGE_AUTOMATICALLY
     beq     @usb
-    
+
     lda     #<str_sdcard
     sta     @__L102+1
     lda     #>str_sdcard
@@ -138,7 +138,8 @@ CH376_GET_IC_VER      = $01
 @display_default_device:
     ldy     tmp1_bank
     ldx     #$00
-@__L102:    
+
+@__L102:
     lda     $dead,x
     beq     @out_default_device
 @__put_device:
@@ -146,10 +147,9 @@ CH376_GET_IC_VER      = $01
     inx
     iny
     bne     @__L102
+
 @out_default_device:
-
-
-    rts    
+    rts
 .endproc
 
 .proc _ch376_ic_get_ver
@@ -159,4 +159,4 @@ CH376_GET_IC_VER      = $01
     and     #%00111111 ; A contains revision
 
     rts
-.endproc    
+.endproc

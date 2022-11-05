@@ -9,7 +9,7 @@
 
 
 .proc _loader_launch_software
-
+    ;jmp _loader_launch_software ; 4AE
     ; Looking for mode index_software_ptr
 
     ; Search first ; and get tape file
@@ -114,15 +114,18 @@
 
     mfree   (index_software)
     mfree   (ptr2)
+
     lda     #$00
     jsr     exit_interface_confirmed
 
+    ldx     #$00
 
     lda     #<BUFEDT
     ldy     #>BUFEDT
 
     BRK_KERNEL XEXEC
 
+    rts
 
     ldy     #$00
 @L12:

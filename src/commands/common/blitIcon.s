@@ -1,9 +1,4 @@
-
-
-
-
-
-ptr_pos_img_src := userzp ; 2
+ptr_pos_img_src  := userzp ; 2
 ptr_pos_img_dest := userzp+2 ; 2
 
 .define ICON_SIZE_X $04
@@ -33,7 +28,7 @@ ptr_pos_img_dest := userzp+2 ; 2
     bne     @L1
 
     lda     ptr_pos_img_src
-    clc 
+    clc
     adc     #ICON_SIZE_X
     bcc     @no_inc
     inc     ptr_pos_img_src+1
@@ -41,7 +36,7 @@ ptr_pos_img_dest := userzp+2 ; 2
     sta     ptr_pos_img_src
 
     lda     ptr_pos_img_dest
-    clc 
+    clc
     adc     #$28
     bcc     @no_inc2
     inc     ptr_pos_img_dest+1
@@ -60,7 +55,7 @@ POSY_ICON=20
 
 icons_list_pos_low:
     .byte <($a000+POSY_ICON*40+1) ; Infos Firmware 2 & 3
-    .byte <($a000+POSY_ICON*40+7)    
+    .byte <($a000+POSY_ICON*40+7)
     .byte <($a000+POSY_ICON*40+13)
     .byte <($a000+POSY_ICON*40+13) ; Game
     .byte <($a000+POSY_ICON*40+7)
@@ -94,36 +89,36 @@ icons_list_pos_high:
 
 icons_list_low:
     .byte <info_icon        ; 0
-    .byte <chip_icon        ; 1    
+    .byte <chip_icon        ; 1
     .byte <reload_chip_icon ; 2
     .byte <joy_icon         ; 3
     .byte <demo_icon        ; 4
     .byte <tools_icon       ; 5
     .byte <command_icon     ; 6
     .byte <exit_icon        ; 7
-    .byte <network_icon     ; 8 
+    .byte <network_icon     ; 8
     .byte <exit_icon        ; 9
     .byte <clock_icon       ; $0A
-    .byte <chip_icon        ; $0B    
+    .byte <chip_icon        ; $0B
     .byte <exit_icon        ; $0C
     .byte <engrenage_icon   ; $0D
     .byte <music_icon       ; $0E
-    
-icons_list_high:    
+
+icons_list_high:
     .byte >info_icon
-    .byte >chip_icon    
+    .byte >chip_icon
     .byte >reload_chip_icon
-    .byte >joy_icon    
+    .byte >joy_icon
     .byte >demo_icon
-    .byte >tools_icon    
+    .byte >tools_icon
     .byte >command_icon
     .byte >exit_icon
-    .byte >network_icon 
-    .byte >exit_icon 
-    .byte >clock_icon 
-    .byte >chip_icon            
-    .byte >exit_icon 
-    .byte >engrenage_icon 
+    .byte >network_icon
+    .byte >exit_icon
+    .byte >clock_icon
+    .byte >chip_icon
+    .byte >exit_icon
+    .byte >engrenage_icon
     .byte >music_icon
 
 reload_chip_icon:

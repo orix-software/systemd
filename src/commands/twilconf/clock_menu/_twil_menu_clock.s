@@ -14,16 +14,10 @@
 .define MONTH   $0C
 .define YEAR    $0F
 
-;.define DAY     $10
-;.define MONTH   $0C+10
-;.define YEAR    $0F+10
-
-
 .proc _twil_menu_clock
     ldx     #$09
     jsr     printToFirmDisplay
     ldx     #13
-    ;jsr     printToFirmDisplay    
 
     lda     #$00
     sta     pos_bar_date
@@ -40,7 +34,7 @@ display_date:
    cmp      #8
    beq      @exit_menu
    cmp      #9
-   beq      @exit_menu   
+   beq      @exit_menu
 
 @no_char_action:
 
@@ -79,23 +73,17 @@ display_date:
     lda     #'/'
     sta     CLOCK_POS_DATE,x
     inx
-    
+
     lda     DS1501_CENTURY_REGISTER
     jsr     display
-
-    
 
     lda     DS1501_YEAR_REGISTER
     jsr     display
 
-    
-
-
-
     jmp     @loop
 
 @exit_menu:
-    rts    
+    rts
 @enter_key:
     ldx     #$00
     lda     CLOCK_POS_DATE,x
@@ -103,7 +91,7 @@ display_date:
     sta     CLOCK_POS_DATE,x
     lda     CLOCK_POS_DATE+1,x
     ora     #%10000000
-    sta     CLOCK_POS_DATE+1,x    
+    sta     CLOCK_POS_DATE+1,x
 
     ldx     #$00
     stx     current_group
@@ -115,16 +103,15 @@ display_date:
     cmp     #$08
     beq     @left
     cmp     #$09
-    beq     @right    
+    beq     @right
     cmp     #11
     beq     @up
     cmp     #13
     beq     @enter
 
-
     cmp     #10
     beq     @down
-    jmp     @read_again    
+    jmp     @read_again
 
 
     rts
@@ -138,36 +125,29 @@ display_date:
 
 @left:
     jmp     @left_management
-    
+
 @down:
     jmp     @down_management
 
 @enter:
-    ;dec     $BB80+40*7+2+7+1
     jsr     @enter_management
-    jmp     @read_again     
+    jmp     @read_again
 
 @enter_management:
-    ;ldx     current_group
-    ;cpx     #HOUR
-    ;bne     @not_minutes
+
     lda     CLOCK_POS_DATE-1,x
     lda     CLOCK_POS_DATE,x
     jsr     _ds1501_unlock_te
     jsr     @save_all
     jsr     _ds1501_lock_te
     rts
-;@not_minutes:
-    ;rts
-    
+
 
 
 @left_management:
     lda     pos_bar_date
     bne     @left_continue_minutes
 
-   
-    
 
     jmp     @read_again
 
@@ -175,72 +155,66 @@ display_date:
     dec     pos_bar_date
     cpx     #MINUTES
     bne     @left_continue_seconds
-    
+
     jsr     @shutoff_group
 
     ldx     #HOUR
     stx     current_group
-    
+
     jsr     @shuton_group
 
-    jmp     @read_again    
+    jmp     @read_again
 
 @left_continue_seconds:
     cpx     #SECONDS
     bne     @left_continue_day
-    
+
     jsr     @shutoff_group
-    
+
     ldx     #MINUTES
     stx     current_group
-    
+
 
     jsr     @shuton_group
-    jmp     @read_again   
+    jmp     @read_again
 @left_continue_day:
     cpx     #DAY
     bne     @left_continue_month
-    
+
     jsr     @shutoff_group
-    
+
     ldx     #SECONDS
     stx     current_group
-    
+
 
     jsr     @shuton_group
 
-    jmp     @read_again    
+    jmp     @read_again
 @left_continue_month:
     cpx     #MONTH
     bne     @left_continue_year
-    
+
     jsr     @shutoff_group
-    
+
     ldx     #DAY
     stx     current_group
-    
+
     jsr     @shuton_group
 
-@exit_near_left:    
-    jmp     @read_again    
+@exit_near_left:
+    jmp     @read_again
 
 @left_continue_year:
- 
     jsr     @shutoff_group
     inx
     inx
     jsr     @shutoff_group
-    
     ldx     #MONTH
     stx     current_group
-    
+
     jsr     @shuton_group
-    
-    
-    jmp     @read_again    
-    
 
-
+    jmp     @read_again
 
 ; RIGHT Management
 
@@ -251,71 +225,69 @@ display_date:
     inc     pos_bar_date
     cpx     #HOUR
     bne     @right_continue_minutes
-    
     jsr     @shutoff_group
-    
+
     ldx     #MINUTES
     stx     current_group
-    
+
     jsr     @shuton_group
 
-@exit_right:    
+@exit_right:
     jmp     @read_again
 
 @right_continue_minutes:
     cpx     #MINUTES
     bne     @right_continue_seconds
-    
+
     jsr     @shutoff_group
 
     ldx     #SECONDS
     stx     current_group
-    
+
     jsr     @shuton_group
 
-    jmp     @read_again    
+    jmp     @read_again
 
 @right_continue_seconds:
     cpx     #SECONDS
     bne     @right_continue_day
-    
     jsr     @shutoff_group
-    
+
     ldx     #DAY
     stx     current_group
-    
+
 
     jsr     @shuton_group
-    jmp     @read_again   
+    jmp     @read_again
 @right_continue_day:
     cpx     #DAY
     bne     @right_continue_month
-    
+
     jsr     @shutoff_group
-    
+
     ldx     #MONTH
     stx     current_group
-    
+
 
     jsr     @shuton_group
 
-    jmp     @read_again    
+    jmp     @read_again
 @right_continue_month:
     cpx     #MONTH
     bne     @right_continue_finish
-    
+
     jsr     @shutoff_group
-    
+
     ldx     #YEAR
     stx     current_group
-    
+
     jsr     @shuton_group
     inx
     inx
     jsr     @shuton_group
 
 @right_continue_finish:
-    jmp     @read_again    
+    jmp     @read_again
 
 @up_management:
     cpx     #SECONDS
@@ -325,10 +297,10 @@ display_date:
     cpx     #DAY
     beq     @up_day
     cpx     #MONTH
-    beq     @up_month    
-    
+    beq     @up_month
+
     cpx     #YEAR
-    beq     @up_year        
+    beq     @up_year
 
     jmp     @test_day
 
@@ -341,7 +313,7 @@ display_date:
     lda     CLOCK_POS_DATE+1,x
     cmp     #'9'+$80
     beq     @right_continue_finish
-    
+
 
 
     jmp     @not_midnight
@@ -368,7 +340,6 @@ display_date:
     jmp     @not_midnight
 
 @up_seconds:
-    
     lda     CLOCK_POS_DATE,x
     cmp     #'5'+$80
     bne     @not_midnight
@@ -385,13 +356,13 @@ display_date:
     cmp     #'2'+$80 ; 23 ?
     bne     @not_midnight
     jmp     @read_again
-@not_midnight:    
+@not_midnight:
 
     lda     CLOCK_POS_DATE+1,x
     cmp     #'9'+$80
     beq     @inc_digit_10
     inc     CLOCK_POS_DATE+1,x
-    jmp     @read_again    
+    jmp     @read_again
 @inc_digit_10:
     lda     CLOCK_POS_DATE,x
     cmp     '3' ; 3 for hour ?
@@ -401,7 +372,7 @@ display_date:
     inc     CLOCK_POS_DATE,x
     lda     #'0'+$80
     sta     CLOCK_POS_DATE+1,x
-    jmp     @read_again         
+    jmp     @read_again
 
 
 ; Down
@@ -411,12 +382,12 @@ display_date:
     cpx     #MONTH
     beq     @down_month_up
     cpx     #YEAR
-    beq     @down_year_up    
-    jmp     @down_manage_down    
+    beq     @down_year_up
+    jmp     @down_manage_down
 
 @down_year_up:
     inx
-    inx    
+    inx
     jmp     @down_manage_down
 
 @down_month_up:
@@ -434,11 +405,11 @@ display_date:
     cmp     #'0'+$80
     bne     @not_midnight_down
     lda     CLOCK_POS_DATE,x
-    cmp     #'0'+$80 
+    cmp     #'0'+$80
     bne     @not_midnight_down
     jmp     @read_again
 
-@not_midnight_down:    
+@not_midnight_down:
     lda     CLOCK_POS_DATE,x
     cmp     #'0'+$80
     beq     @dec_digit_10
@@ -446,20 +417,17 @@ display_date:
     cmp     #'0'+$80
     bne     @dec_digit_10
     dec     CLOCK_POS_DATE,x
-    
+
     lda     #'9'+$80
     sta     CLOCK_POS_DATE+1,x
 
-    jmp     @read_again     
-    
-    
-    
-    
-    ;jmp     @read_again    
+    jmp     @read_again
+
+
 @dec_digit_10:
     dec     CLOCK_POS_DATE+1,x
 
-    jmp     @read_again        
+    jmp     @read_again
 
 
 @shutoff_group:
@@ -485,11 +453,11 @@ display_date:
     ldx     #HOUR
     jsr     @rol_and_compute
     sta     DS1501_HOUR_REGISTER
-    
+
     ldx     #MINUTES
     jsr     @rol_and_compute
-    sta     DS1501_MINUTES_REGISTER    
-    
+    sta     DS1501_MINUTES_REGISTER
+
     ldx     #SECONDS
     jsr     @rol_and_compute
     sta     DS1501_SECONDS_REGISTER
@@ -500,14 +468,14 @@ display_date:
 
     ldx     #MONTH
     jsr     @rol_and_compute
-   ; ora     DS1501_MONTH_REGISTER     
+
     sta     DS1501_MONTH_REGISTER
-    
+
     ldx     #YEAR
     inx
     inx
     jsr     @rol_and_compute
-   
+
     sta     DS1501_YEAR_REGISTER
 
     ; set century to 20
@@ -515,7 +483,7 @@ display_date:
     sta     DS1501_CENTURY_REGISTER
 
     rts
-@rol_and_compute:    
+@rol_and_compute:
     lda     CLOCK_POS_DATE,x
     and     #%01111111
     sec
@@ -532,15 +500,15 @@ display_date:
     ora     compute
     rts
 compute:
-    .res 1    
+    .res    1
 current_group:
     .res    1
 group:
     .res    1
 
-display:  
+display:
     pha
-    
+
     ror
     ror
     ror
@@ -550,7 +518,7 @@ display:
     lda     bcd_table,y
     sta     CLOCK_POS_DATE,x
     inx
-    pla    
+    pla
     and     #%00001111
     tay
     lda     bcd_table,y
@@ -558,9 +526,9 @@ display:
     inx
     rts
 
-display_time:  
+display_time:
     pha
-    
+
     ror
     ror
     ror
@@ -570,7 +538,7 @@ display_time:
     lda     bcd_table,y
     sta     CLOCK_POS_TIME,x
     inx
-    pla    
+    pla
     and     #%00001111
     tay
     lda     bcd_table,y
@@ -578,7 +546,7 @@ display_time:
     inx
     rts
 
-bcd_table:    
+bcd_table:
     .byte "0"
     .byte "1"
     .byte "2"
@@ -601,7 +569,7 @@ bcd_table:
     .byte "I"
     .byte "J"
 
-bcd_table_reverse:    
+bcd_table_reverse:
     .byte "0"
     .byte "1"
     .byte "2"
@@ -611,7 +579,7 @@ bcd_table_reverse:
     .byte "6"
     .byte "7"
     .byte "8"
-    .byte "9"    
+    .byte "9"
 
 pos_date:
     .byte HOUR
@@ -622,12 +590,11 @@ pos_date:
     .byte YEAR
 pos_bar_date:
     .res 1
-.endproc    
+.endproc
 
 
 .proc _ds1501_unlock_te
     ; Set write bit
-    
     lda     DS1501_CTRLB_REGISTER
     and     #%01111111
     sta     DS1501_CTRLB_REGISTER
@@ -636,7 +603,6 @@ pos_bar_date:
 
 .proc _ds1501_lock_te
     ; Set write bit
-    
     lda     DS1501_CTRLB_REGISTER
     ora     #%10000000
     sta     DS1501_CTRLB_REGISTER

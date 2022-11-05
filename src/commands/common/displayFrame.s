@@ -211,20 +211,20 @@ __pos2:
     rts
 
 down_left:
-    .byt $71
-    .byt $70
-    .byt $58
-    .byt $5C
-    .byt $4F
-    .byt $43
-    .byt 64 ; Not used except for redef char
-    .byt 64 ; Not used except for redef char
+    .byt     $71
+    .byt     $70
+    .byt     $58
+    .byt     $5C
+    .byt     $4F
+    .byt     $43
+    .byt     64 ; Not used except for redef char
+    .byt     64 ; Not used except for redef char
 
 up_left:
-    .byte $43,$4f,$5c,$58,$70,$71
+    .byte     $43,$4f,$5c,$58,$70,$71
 
 up_right:
-    .byt $70
+    .byt     $70
     .byt $7C
     .byt $4E
     .byt $46
