@@ -29,14 +29,16 @@ code: $(SOURCE)
 	$(LD) -tnone -o $(PROGRAM).rom  $(PROGRAM).ld65
 	mkdir build/bin &&  mkdir build/usr/share/systemd/$(VERSION) -p  && cp $(PROGRAM).rom build/usr/share/systemd/$(VERSION)/$(PROGRAM).rom  && cp $(PROGRAM).rom build/usr/share/systemd/$(PROGRAM).rom 
 	chmod +x dependencies/orix-sdk/bin/relocbin.py3
-	$(CC) -o 1000 -ttelestrat src/commands/twilconf/main.c libs/lib8/twil.lib --start-addr \$800
-	$(CC) -o 1256 -ttelestrat src/commands/twilconf/main.c libs/lib8/twil.lib --start-addr \$900
+	$(CC) -ttelestrat -o 1000 src/commands/twilconf/main.c libs/lib8/twil.lib --start-addr \$800
+	$(CC) -ttelestrat -o 1256 src/commands/twilconf/main.c libs/lib8/twil.lib --start-addr \$900
 	# Reloc
 	dependencies/orix-sdk/bin/relocbin.py3 -o build/bin/twiconf -2 1000 1256
 
+	exit
+
 	$(CC) -o 1000 -ttelestrat src/commands/loader/main.c libs/lib8/twil.lib --start-addr \$800
 	$(CC) -o 1256 -ttelestrat src/commands/loader/main.c libs/lib8/twil.lib --start-addr \$900
-	dependencies/orix-sdk/bin/relocbin.py3 -o build/bin/twiconf -2 1000 1256
+	dependencies/orix-sdk/bin/relocbin.py3 -o build/bin/twiload -2 1000 1256
 
 	#$(CC) -ttelestrat src/commands/twilconf/main.c libs/lib8/twil.lib -o build/bin/twiconf
 	#$(CC) -ttelestrat src/commands/loader/main.c libs/lib8/twil.lib -o build/bin/twiload

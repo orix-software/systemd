@@ -17,6 +17,8 @@ ld65 -tnone  tmp/systemd.ld65 -o systemd.rom -Ln tmp/systemd.sym -m tmp/memmap.t
 mkdir -p $ORICUTRON_PATH/sdcard/usr/share/systemd
 cp systemd.rom $ORICUTRON_PATH/sdcard/usr/share/systemd
 
+cp build/bin/twiload  $ORICUTRON_PATH/sdcard/bin
+
 #echo cp systemd.rom $ORICUTRON_PATH/sdcard/usr/share/systemd
 cp systemd.rom $ORICUTRON_PATH/roms
 mkdir $ORICUTRON_PATH/sdcard/etc/systemd
